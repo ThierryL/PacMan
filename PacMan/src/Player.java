@@ -307,23 +307,35 @@ public class Player extends JPanel implements ActionListener {
           {
             if (key == KeyEvent.VK_LEFT)
             {
+            	System.out.println("left");
               reqdx=-1;
               reqdy=0;
+              player.setReqdx(reqdx);
+              player.setReqdy(reqdy);
             }
             else if (key == KeyEvent.VK_RIGHT)
             {
+            	System.out.println("right");
               reqdx=1;
               reqdy=0;
+              player.setReqdx(reqdx);
+              player.setReqdy(reqdy);
             }
             else if (key == KeyEvent.VK_UP)
             {
+            	System.out.println("up");
               reqdx=0;
               reqdy=-1;
+              player.setReqdx(reqdx);
+              player.setReqdy(reqdy);
             }
             else if (key == KeyEvent.VK_DOWN)
             {
+            	System.out.println("down");
               reqdx=0;
               reqdy=1;
+              player.setReqdx(reqdx);
+              player.setReqdy(reqdy);
             }
             else if (key == KeyEvent.VK_ESCAPE && timer.isRunning())
             {
@@ -334,13 +346,12 @@ public class Player extends JPanel implements ActionListener {
                     timer.stop();
                 else timer.start();
             }
-            player.setReqdx(reqdx);
-            player.setReqdy(reqdy);
           }
           else
           {
             if (key == 's' || key == 'S')
           {
+            	System.out.println("coucou");
               player.setIngame(true);
               game.GameInit(player);
             }

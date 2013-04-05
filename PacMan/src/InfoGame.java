@@ -31,6 +31,7 @@ public class InfoGame {
 
 	public void setBegin(boolean begin) {
 		this.begin = begin;
+		System.out.println("begin");
 	}
     
     public void InitScreenData(){
@@ -114,14 +115,20 @@ public class InfoGame {
 			System.out.println("First Player");
 			players = new ArrayList<InfoPlayer>();
 			players.add(player);
+			setBegin(true);
 		}
 		else {
-			
+			//PlayGame();
 		}
 	}
 
 	public void PlayGame() {
+		System.out.println("Play !");
 		server.PlayGame(players);
+	}
+
+	public void notifyMove() {
+		PlayGame();
 	}
 
 }

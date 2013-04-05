@@ -11,7 +11,6 @@ public class Server {
     int[] dx, dy;
     int[] ghostdx, ghostdy, ghostspeed;
     
-    int reqdx,reqdy;
 
     InfoGame game;
 
@@ -43,8 +42,6 @@ public class Server {
 
     	game = new InfoGame();
     	game.setServer(this);
-    	reqdx = 0;
-    	reqdy = 0;
     	game.InitScreenData();
         game.Initghostx(new int[maxghosts]);
         ghostdx = new int[maxghosts];
@@ -186,6 +183,10 @@ public class Server {
         int nrofblocks = game.getNrofblocks();
         short[] screendata = game.getScreendata();
 
+        int reqdx = player.getReqdx();
+        int reqdy = player.getReqdy();
+        
+        
         if (reqdx == -player.getPacmandx() && reqdy == -player.getPacmandy()) {
         	player.setPacmandx(reqdx);
         	player.setPacmandy(reqdy);
@@ -271,8 +272,6 @@ public class Server {
         player.setPacmanx(11 * blocksize);
         player.setPacmanx(0);
         player.setPacmanx(0);
-        reqdx = 0;
-        reqdy = 0;
         player.setViewdx(-1);
         player.setViewdy(0);
         player.setDying(false);
