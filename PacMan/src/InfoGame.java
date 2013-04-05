@@ -116,9 +116,10 @@ public class InfoGame {
 			players = new ArrayList<InfoPlayer>();
 			players.add(player);
 			setBegin(true);
+			server.GameInit(player);
 		}
 		else {
-			//PlayGame();
+			server.GameInit(player);
 		}
 	}
 

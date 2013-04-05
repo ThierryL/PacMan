@@ -1,4 +1,4 @@
-import java.awt.Graphics2D;
+
 import java.util.ArrayList;
 
 
@@ -253,7 +253,6 @@ public class Server {
         int blocksize = game.getBlocksize();
         int[] ghosty = game.getGhosty();
         int[] ghostx = game.getGhostx();
-        int nrofblocks = game.getNrofblocks();
         int nrofghosts = game.getNrofghosts();
         
         for (i = 0; i < nrofghosts; i++) {
@@ -269,9 +268,9 @@ public class Server {
         }
 
         player.setPacmanx(7 * blocksize);
-        player.setPacmanx(11 * blocksize);
-        player.setPacmanx(0);
-        player.setPacmanx(0);
+        player.setPacmany(11 * blocksize);
+        player.setPacmandx(0);
+        player.setPacmandy(0);
         player.setViewdx(-1);
         player.setViewdy(0);
         player.setDying(false);

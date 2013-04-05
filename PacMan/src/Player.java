@@ -142,16 +142,16 @@ public class Player extends JPanel implements ActionListener {
     public void DrawPacManUp() {    	
         switch (pacmananimpos) {
         case 1:
-            g2d.drawImage(pacman2up, player.getPacmandx() + 1, player.getPacmandy() + 1, this);
+            g2d.drawImage(pacman2up, player.getPacmanx() + 1, player.getPacmany() + 1, this);
             break;
         case 2:
-            g2d.drawImage(pacman3up, player.getPacmandx() + 1, player.getPacmandy() + 1, this);
+            g2d.drawImage(pacman3up, player.getPacmanx() + 1, player.getPacmany() + 1, this);
             break;
         case 3:
-            g2d.drawImage(pacman4up, player.getPacmandx() + 1, player.getPacmandy() + 1, this);
+            g2d.drawImage(pacman4up, player.getPacmanx() + 1, player.getPacmany() + 1, this);
             break;
         default:
-            g2d.drawImage(pacman1, player.getPacmandx() + 1, player.getPacmandy() + 1, this);
+            g2d.drawImage(pacman1, player.getPacmanx() + 1, player.getPacmany() + 1, this);
             break;
         }
     }
@@ -160,16 +160,16 @@ public class Player extends JPanel implements ActionListener {
     public void DrawPacManDown() {
         switch (pacmananimpos) {
         case 1:
-            g2d.drawImage(pacman2down, player.getPacmandx() + 1, player.getPacmandy() + 1, this);
+            g2d.drawImage(pacman2down, player.getPacmanx() + 1, player.getPacmany() + 1, this);
             break;
         case 2:
-            g2d.drawImage(pacman3down, player.getPacmandx() + 1, player.getPacmandy() + 1, this);
+            g2d.drawImage(pacman3down, player.getPacmanx() + 1, player.getPacmany() + 1, this);
             break;
         case 3:
-            g2d.drawImage(pacman4down, player.getPacmandx() + 1, player.getPacmandy() + 1, this);
+            g2d.drawImage(pacman4down, player.getPacmanx() + 1, player.getPacmany() + 1, this);
             break;
         default:
-            g2d.drawImage(pacman1, player.getPacmandx() + 1, player.getPacmandy() + 1, this);
+            g2d.drawImage(pacman1, player.getPacmanx() + 1, player.getPacmany() + 1, this);
             break;
         }
     }
@@ -178,16 +178,16 @@ public class Player extends JPanel implements ActionListener {
     public void DrawPacManLeft() {
         switch (pacmananimpos) {
         case 1:
-            g2d.drawImage(pacman2left, player.getPacmandx() + 1, player.getPacmandy() + 1, this);
+            g2d.drawImage(pacman2left, player.getPacmanx() + 1, player.getPacmany() + 1, this);
             break;
         case 2:
-            g2d.drawImage(pacman3left, player.getPacmandx() + 1, player.getPacmandy() + 1, this);
+            g2d.drawImage(pacman3left, player.getPacmanx() + 1, player.getPacmany() + 1, this);
             break;
         case 3:
-            g2d.drawImage(pacman4left, player.getPacmandx() + 1, player.getPacmandy() + 1, this);
+            g2d.drawImage(pacman4left, player.getPacmanx() + 1, player.getPacmany() + 1, this);
             break;
         default:
-            g2d.drawImage(pacman1, player.getPacmandx() + 1, player.getPacmandy() + 1, this);
+            g2d.drawImage(pacman1, player.getPacmanx() + 1, player.getPacmany() + 1, this);
             break;
         }
     }
@@ -196,16 +196,16 @@ public class Player extends JPanel implements ActionListener {
     public void DrawPacManRight() {
         switch (pacmananimpos) {
         case 1:
-            g2d.drawImage(pacman2right, player.getPacmandx() + 1, player.getPacmandy() + 1, this);
+            g2d.drawImage(pacman2right, player.getPacmanx() + 1, player.getPacmany() + 1, this);
             break;
         case 2:
-            g2d.drawImage(pacman3right, player.getPacmandx() + 1, player.getPacmandy() + 1, this);
+            g2d.drawImage(pacman3right, player.getPacmanx() + 1, player.getPacmany() + 1, this);
             break;
         case 3:
-            g2d.drawImage(pacman4right, player.getPacmandx() + 1, player.getPacmandy() + 1, this);
+            g2d.drawImage(pacman4right, player.getPacmanx() + 1, player.getPacmany() + 1, this);
             break;
         default:
-            g2d.drawImage(pacman1, player.getPacmandx() + 1, player.getPacmandy() + 1, this);
+            g2d.drawImage(pacman1, player.getPacmanx() + 1, player.getPacmany() + 1, this);
             break;
         }
     }
