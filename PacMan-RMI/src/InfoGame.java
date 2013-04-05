@@ -14,6 +14,11 @@ import java.util.ArrayList;
 
 public class InfoGame  extends UnicastRemoteObject implements I_InfoGame{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	protected InfoGame() throws RemoteException {
 		super();
 	}

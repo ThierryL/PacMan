@@ -21,6 +21,7 @@ public class InfoGame {
 
     private boolean begin = false;
 
+<<<<<<< HEAD
     public InfoPlayer createInfoPlayer(){
 	    InfoPlayer player = null;
 	    try {
@@ -32,6 +33,13 @@ public class InfoGame {
 
     }
 
+=======
+    
+    public InfoPlayer createInfoPlayer() {
+    	return new InfoPlayer();
+    }
+    
+>>>>>>> 04b4d04355ae6391458db7ba466760cdff1b88a7
     public void setServer(Server s) {
     	server = s;
     }
@@ -123,7 +131,6 @@ public class InfoGame {
 
 	public void GameInit(InfoPlayer player) {
 		if (!isBegin() && players == null) {
-			System.out.println("First Player");
 			players = new ArrayList<InfoPlayer>();
 			players.add(player);
 			setBegin(true);
