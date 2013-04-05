@@ -5,7 +5,11 @@ import java.rmi.server.UnicastRemoteObject;
 public class InfoPlayer extends UnicastRemoteObject implements I_InfoPlayer{
 
 	
-    private boolean ingame = false;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	private boolean ingame = false;
     private boolean dying = false;
     private final int pacmanspeed = 6;
     private int pacsleft, score;
