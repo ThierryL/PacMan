@@ -21,6 +21,11 @@ public class InfoGame {
 
     private boolean begin = false;
 
+    
+    public InfoPlayer createInfoPlayer() {
+    	return new InfoPlayer();
+    }
+    
     public void setServer(Server s) {
     	server = s;
     }
@@ -112,7 +117,6 @@ public class InfoGame {
 
 	public void GameInit(InfoPlayer player) {
 		if (!isBegin() && players == null) {
-			System.out.println("First Player");
 			players = new ArrayList<InfoPlayer>();
 			players.add(player);
 			setBegin(true);
@@ -124,7 +128,6 @@ public class InfoGame {
 	}
 
 	public void PlayGame() {
-		System.out.println("Play !");
 		server.PlayGame(players);
 	}
 
