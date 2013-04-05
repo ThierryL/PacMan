@@ -43,7 +43,7 @@ public class Server {
 
 	public Server() {
 
-		try {
+		//try {
 			game.setServer(this);
 			game.InitScreenData();
 			game.Initghostx(new int[maxghosts]);
@@ -53,9 +53,9 @@ public class Server {
 			ghostspeed = new int[maxghosts];
 			dx = new int[4];
 			dy = new int[4];
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		}
+		//} catch (RemoteException e) {
+			//e.printStackTrace();
+		//}
 	}
 
 	public void PlayGame(ArrayList<InfoPlayer> players) {

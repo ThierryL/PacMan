@@ -17,7 +17,7 @@ public class InfoPlayer extends UnicastRemoteObject implements I_InfoPlayer{
     public InfoPlayer() throws RemoteException{
 	    super();
     }
-
+    
     public boolean getIngame() throws RemoteException{
     	return ingame;
     }

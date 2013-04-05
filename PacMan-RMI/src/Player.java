@@ -17,6 +17,12 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
+import java.rmi.Naming;
+import java.rmi.ConnectException;
+import java.rmi.RemoteException;
+import java.rmi.NotBoundException;
+import java.net.MalformedURLException;
+
 public class Player extends JPanel implements ActionListener {
 
 	/**
@@ -50,16 +56,34 @@ public class Player extends JPanel implements ActionListener {
 	Timer timer;
 
 
-	public Player(InfoGame g, InfoPlayer p) {
+	public Player() {
 
 		try {
-			game = g;
-			player = p;
-			player.setPlayer(this);
-
-		} catch (Exception e) {
-			e.printStackTrace();
+			game = (InfoGame) Naming.lookup("rmi://localhost:1099/InfoGame");
+		} catch (NotBoundException e){
+			System.out.println("El servicio no esta publicado en el servidor");
+			System.exit(128);
+		} catch (MalformedURLException e){
+			System.out.println("URL invalida");
+			System.exit(128);
+		} catch (RemoteException e){
+			System.out.println("Excepcion remota tratanod de conectarse al servidor");
+			System.exit(128);
 		}
+
+		try {
+			player = new InfoPlayer();
+			player.setPlayer(this);
+			Naming.rebind("rmi://localhost:1099/InfoPlayer", player);
+			game.newPlayer();
+		} catch (MalformedURLException e){
+			System.out.println("URL invalida");
+			System.exit(128);
+		} catch (RemoteException e){
+			System.out.println("Excepcion remota tratanod de conectarse al servidor");
+			System.exit(128);
+		}
+
 
 		GetImages();
 
@@ -79,7 +103,7 @@ public class Player extends JPanel implements ActionListener {
 	public void addNotify() {
 		super.addNotify();
 		try {
-			game.GameInit(player);
+			game.GameInit();
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -412,7 +436,7 @@ public class Player extends JPanel implements ActionListener {
 					if (key == 's' || key == 'S')
 					{
 						player.setIngame(true);
-						game.GameInit(player);
+						game.GameInit();
 					}
 				}
 

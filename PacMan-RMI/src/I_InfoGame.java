@@ -3,7 +3,7 @@ import java.rmi.Remote;
 
 public interface I_InfoGame extends Remote{
 
-    public InfoPlayer createInfoPlayer() throws RemoteException;
+    public void newPlayer() throws RemoteException;
 
     public void setServer(Server s) throws RemoteException;
     
@@ -43,7 +43,7 @@ public interface I_InfoGame extends Remote{
 
 	public int getScrsize() throws RemoteException;
 
-	public void GameInit(InfoPlayer player) throws RemoteException;
+	public void GameInit() throws RemoteException;
 
 	public void PlayGame() throws RemoteException;
 

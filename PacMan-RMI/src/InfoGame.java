@@ -1,3 +1,8 @@
+import java.rmi.Naming;
+import java.rmi.ConnectException;
+import java.rmi.RemoteException;
+import java.rmi.NotBoundException;
+import java.net.MalformedURLException;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
@@ -27,15 +32,15 @@ public class InfoGame  extends UnicastRemoteObject implements I_InfoGame{
 
     private boolean begin = false;
 
-    public InfoPlayer createInfoPlayer(){
-	    InfoPlayer player = null;
-	    try {
-	    player= new InfoPlayer();
-	    } catch (Exception e) {
-		    e.printStackTrace();
-	    }
-	    return player;
-
+    public void newPlayer(){
+//	    InfoPlayer player = null;
+//	    try {
+//	    player= new InfoPlayer();
+//	    } catch (Exception e) {
+//		    e.printStackTrace();
+//	    }
+//	    return player;
+//
     }
 
     public void setServer(Server s) {
@@ -126,15 +131,30 @@ public class InfoGame  extends UnicastRemoteObject implements I_InfoGame{
 		return scrsize;
 	}
 
-	public void GameInit(InfoPlayer player) {
+	public void GameInit() {
+		InfoPlayer player = null;
 		if (!isBegin() && players == null) {
 			players = new ArrayList<InfoPlayer>();
+
+			try {
+				player = (InfoPlayer) Naming.lookup("rmi://localhost:1099/InfoPlayer");
+			} catch (NotBoundException e){
+				System.out.println("El servicio no esta publicado en el servidor");
+				System.exit(128);
+			} catch (MalformedURLException e){
+				System.out.println("URL invalida");
+				System.exit(128);
+			} catch (RemoteException e){
+				System.out.println("Excepcion remota tratanod de conectarse al servidor");
+				System.exit(128); 
+			}  
+
 			players.add(player);
 			setBegin(true);
 			server.GameInit(player);
 		}
 		else {
-			server.GameInit(player);
+			server.GameInit(players.get(0));
 		}
 	}
 
