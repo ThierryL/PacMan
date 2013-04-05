@@ -1,5 +1,8 @@
-
+import java.rmi.NotBoundException;
 import java.util.ArrayList;
+import java.rmi.RemoteException;
+import java.rmi.Naming;
+import java.net.MalformedURLException;
 
 
 
@@ -54,18 +57,22 @@ public class Server {
     }
 
     public void PlayGame(ArrayList<InfoPlayer> players) {
-    	for(int i = 0; i<players.size(); i++){
-    		if (players.get(i).getDying()) {
-                Death(players.get(i));
-            } else {
-                MovePacMan(players.get(i));
-                players.get(i).DrawPacMan();
-                moveGhosts(players.get(i));
-                CheckMaze(players.get(i));
-            }
-    	}
-        
+	    try {
+		    for(int i = 0; i<players.size(); i++){
+			    if (players.get(i).getDying()) {
+				    Death(players.get(i));
+			    } else {
+				    MovePacMan(players.get(i));
+				    players.get(i).DrawPacMan();
+				    moveGhosts(players.get(i));
+				    CheckMaze(players.get(i));
+			    }
+		    }
+	    } catch (Exception e) {
+		    e.printStackTrace();
+	    }
     }
+        
     
 
     public void CheckMaze(InfoPlayer player) {
@@ -82,22 +89,30 @@ public class Server {
         }
 
         if (finished) {
-            player.setScore(player.getScore()+50);
+		try {
+			player.setScore(player.getScore()+50);
 
-            if (nrofghosts < maxghosts)
-                game.setNrofghosts(nrofghosts++);
-            if (currentspeed < maxspeed)
-                currentspeed++;
-            LevelInit(player);
+			if (nrofghosts < maxghosts)
+				game.setNrofghosts(nrofghosts++);
+			if (currentspeed < maxspeed)
+				currentspeed++;
+			LevelInit(player);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
         }
     }
     
     public void Death(InfoPlayer player) {
+	    try {
 
-        player.setPacsleft(player.getPacsleft()-1);
-        if (player.getPacsleft() == 0)
-        	player.setIngame(false);
-        LevelContinue(player);
+		    player.setPacsleft(player.getPacsleft()-1);
+		    if (player.getPacsleft() == 0)
+			    player.setIngame(false);
+		    LevelContinue(player);
+	    } catch (Exception e) {
+		    e.printStackTrace();
+	    }
     }
 
 
@@ -161,88 +176,115 @@ public class Server {
             }
             ghostx[i] = ghostx[i] + (ghostdx[i] * ghostspeed[i]);
             ghosty[i] = ghosty[i] + (ghostdy[i] * ghostspeed[i]);
-            player.drawGhost(ghostx[i] + 1, ghosty[i] + 1);
+	    try {
+		    player.drawGhost(ghostx[i] + 1, ghosty[i] + 1);
+	    } catch (Exception e) {
+		    e.printStackTrace();
+	    }
 
-            if (player.getPacmanx() > (ghostx[i] - 12) && player.getPacmanx() < (ghostx[i] + 12) &&
-            		player.getPacmany() > (ghosty[i] - 12) && player.getPacmany() < (ghosty[i] + 12) &&
-                player.getIngame()) {
+	    try {
+		    if (player.getPacmanx() > (ghostx[i] - 12) && player.getPacmanx() < (ghostx[i] + 12) &&
+				    player.getPacmany() > (ghosty[i] - 12) && player.getPacmany() < (ghosty[i] + 12) &&
+				    player.getIngame()) {
 
-                player.setDying(true);
-                game.setDeathcounter(64);
+			    player.setDying(true);
+			    game.setDeathcounter(game.getDeathcounter() +64);
 
-            }
-        }
+				    }
+	    } catch (Exception e) {
+		    e.printStackTrace();
+	    }
+	}
     }
     
 
-    public void MovePacMan(InfoPlayer player) {
-        int pos;
-        short ch;
-        
-        int blocksize = game.getBlocksize();
-        int nrofblocks = game.getNrofblocks();
-        short[] screendata = game.getScreendata();
+public void MovePacMan(InfoPlayer player) {
+	int pos;
+	short ch;
 
-        int reqdx = player.getReqdx();
-        int reqdy = player.getReqdy();
-        
-        
-        if (reqdx == -player.getPacmandx() && reqdy == -player.getPacmandy()) {
-        	player.setPacmandx(reqdx);
-        	player.setPacmandy(reqdy);
-        	player.setViewdx(reqdx);
-        	player.setViewdy(reqdy);
-        }
-        if (player.getPacmanx() % blocksize == 0 && player.getPacmany() % blocksize == 0) {
-            pos = player.getPacmanx() / blocksize + nrofblocks * (int)(player.getPacmany() / blocksize);
-            ch = screendata[pos];
+	int blocksize = game.getBlocksize();
+	int nrofblocks = game.getNrofblocks();
+	short[] screendata = game.getScreendata();
 
-            if ((ch & 16) != 0) {
-                screendata[pos] = (short)(ch & 15);
-                player.setScore(player.getScore()+1);
-            }
-
-            if (reqdx != 0 || reqdy != 0) {
-                if (!((reqdx == -1 && reqdy == 0 && (ch & 1) != 0) ||
-                      (reqdx == 1 && reqdy == 0 && (ch & 4) != 0) ||
-                      (reqdx == 0 && reqdy == -1 && (ch & 2) != 0) ||
-                      (reqdx == 0 && reqdy == 1 && (ch & 8) != 0))) {
-                	player.setPacmandx(reqdx);
-                	player.setPacmandy(reqdy);
-                	player.setViewdx(reqdx);
-                	player.setViewdy(reqdy);
-                }
-            }
-
-            // Check for standstill
-            if ((player.getPacmandx() == -1 && player.getPacmandy() == 0 && (ch & 1) != 0) ||
-                (player.getPacmandx() == 1 && player.getPacmandy() == 0 && (ch & 4) != 0) ||
-                (player.getPacmandx() == 0 && player.getPacmandy() == -1 && (ch & 2) != 0) ||
-                (player.getPacmandx() == 0 && player.getPacmandy() == 1 && (ch & 8) != 0)) {
-            	player.setPacmandx(0);
-            	player.setPacmandy(0);
-            }
-        }
-        player.setPacmanx(player.getPacmanx() + player.getPacmanspeed() * player.getPacmandx());
-        player.setPacmany(player.getPacmany() + player.getPacmanspeed() * player.getPacmandy());
-        
-        game.setScreendata(screendata);
-    }
+	try {
+		int reqdx = player.getReqdx();
+		int reqdy = player.getReqdy();
 
 
-    public void GameInit(InfoPlayer player) {
-        player.setPacsleft(3);
-        player.setScore(0);
-        LevelInit(player);
-        game.setNrofghosts(6);
-        currentspeed = 3;
-    }
+		if (reqdx == -player.getPacmandx() && reqdy == -player.getPacmandy()) {
+			player.setPacmandx(reqdx);
+			player.setPacmandy(reqdy);
+			player.setViewdx(reqdx);
+			player.setViewdy(reqdy);
+		}
+		if (player.getPacmanx() % blocksize == 0 && player.getPacmany() % blocksize == 0) {
+			pos = player.getPacmanx() / blocksize + nrofblocks * (int)(player.getPacmany() / blocksize);
+			ch = screendata[pos];
+
+			if ((ch & 16) != 0) {
+				screendata[pos] = (short)(ch & 15);
+				player.setScore(player.getScore()+1);
+			}
+
+			if (reqdx != 0 || reqdy != 0) {
+				if (!((reqdx == -1 && reqdy == 0 && (ch & 1) != 0) ||
+							(reqdx == 1 && reqdy == 0 && (ch & 4) != 0) ||
+							(reqdx == 0 && reqdy == -1 && (ch & 2) != 0) ||
+							(reqdx == 0 && reqdy == 1 && (ch & 8) != 0))) {
+					player.setPacmandx(reqdx);
+					player.setPacmandy(reqdy);
+					player.setViewdx(reqdx);
+					player.setViewdy(reqdy);
+							}
+			}
+
+			// Check for standstill
+			if ((player.getPacmandx() == -1 && player.getPacmandy() == 0 && (ch & 1) != 0) ||
+					(player.getPacmandx() == 1 && player.getPacmandy() == 0 && (ch & 4) != 0) ||
+					(player.getPacmandx() == 0 && player.getPacmandy() == -1 && (ch & 2) != 0) ||
+					(player.getPacmandx() == 0 && player.getPacmandy() == 1 && (ch & 8) != 0)) {
+				player.setPacmandx(0);
+				player.setPacmandy(0);
+					}
+		}
+		player.setPacmanx(player.getPacmanx() + player.getPacmanspeed() * player.getPacmandx());
+		player.setPacmany(player.getPacmany() + player.getPacmanspeed() * player.getPacmandy());
 
 
-    public void LevelInit(InfoPlayer player) {
-        game.setScreendata(leveldata);
-        LevelContinue(player);
-    }
+	} catch (Exception e) {
+		e.printStackTrace();
+	}
+
+	game.setScreendata(screendata);
+}
+
+
+public void GameInit(InfoPlayer player) {
+	try {
+		player.setPacsleft(3);
+		player.setScore(0);
+		LevelInit(player);
+
+	} catch (Exception e) {
+		e.printStackTrace();
+	}
+
+	game.setNrofghosts(6);
+	currentspeed = 3;
+}
+
+
+public void LevelInit(InfoPlayer player) {
+	try{
+
+		game.setScreendata(leveldata);
+		LevelContinue(player);
+
+	} catch (Exception e) {
+		e.printStackTrace();
+	}
+
+}
 
 
     public void LevelContinue(InfoPlayer player) {
@@ -267,13 +309,19 @@ public class Server {
             ghostspeed[i] = validspeeds[random];
         }
 
-        player.setPacmanx(7 * blocksize);
-        player.setPacmany(11 * blocksize);
-        player.setPacmandx(0);
-        player.setPacmandy(0);
-        player.setViewdx(-1);
-        player.setViewdy(0);
-        player.setDying(false);
+	try {
+		player.setPacmanx(7 * blocksize);
+		player.setPacmany(11 * blocksize);
+		player.setPacmandx(0);
+		player.setPacmandy(0);
+		player.setViewdx(-1);
+		player.setViewdy(0);
+		player.setDying(false);
+
+	} catch (Exception e) {
+		e.printStackTrace();
+	}
+
     }
 
     

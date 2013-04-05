@@ -1,7 +1,8 @@
+import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
 
 
-
-public class InfoPlayer {
+public class InfoPlayer extends UnicastRemoteObject implements I_InfoPlayer{
 
 	
     private boolean ingame = false;
@@ -13,115 +14,119 @@ public class InfoPlayer {
     
     private int viewdx, viewdy, reqdx, reqdy;
 
-    public boolean getIngame(){
+    public InfoPlayer() throws RemoteException{
+	    super();
+    }
+
+    public boolean getIngame() throws RemoteException{
     	return ingame;
     }
     
-    public void setIngame(boolean b){
+    public void setIngame(boolean b) throws RemoteException{
     	ingame = b;
     }
 
-    public boolean getDying(){
+    public boolean getDying() throws RemoteException{
     	return dying;
     }
     
-    public void setDying(boolean b){
+    public void setDying(boolean b) throws RemoteException{
     	dying = b;
     }
     
-    public int getScore(){
+    public int getScore() throws RemoteException{
     	return score;
     }
     
-    public void setScore(int i){
+    public void setScore(int i) throws RemoteException{
     	score = i;
     }    
     
-    public int getViewdx(){
+    public int getViewdx() throws RemoteException{
     	return viewdx;
     }
     
-    public void setViewdx(int i){
+    public void setViewdx(int i) throws RemoteException{
     	viewdx = i;
     }
     
-    public int getViewdy(){
+    public int getViewdy() throws RemoteException{
     	return viewdy;
     }
     
-    public void setViewdy(int i){
+    public void setViewdy(int i) throws RemoteException{
     	viewdy = i;
     }
 
-	public int getPacmanx() {
+	public int getPacmanx()  throws RemoteException{
 		return pacmanx;
 	}
 
-	public void setPacmanx(int pacmanx) {
+	public void setPacmanx(int pacmanx)  throws RemoteException{
 		this.pacmanx = pacmanx;
 	}
 
-	public int getPacmany() {
+	public int getPacmany()  throws RemoteException{
 		return pacmany;
 	}
 
-	public void setPacmany(int pacmany) {
+	public void setPacmany(int pacmany)  throws RemoteException{
 		this.pacmany = pacmany;
 	}
 
-	public int getPacmandx() {
+	public int getPacmandx()  throws RemoteException{
 		return pacmandx;
 	}
 
-	public void setPacmandx(int pacmandx) {
+	public void setPacmandx(int pacmandx)  throws RemoteException{
 		this.pacmandx = pacmandx;
 	}
 
-	public int getPacmandy() {
+	public int getPacmandy()  throws RemoteException{
 		return pacmandy;
 	}
 
-	public void setPacmandy(int pacmandy) {
+	public void setPacmandy(int pacmandy)  throws RemoteException{
 		this.pacmandy = pacmandy;
 	}
 
-	public int getPacsleft() {
+	public int getPacsleft()  throws RemoteException{
 		return pacsleft;
 	}
 
-	public void setPacsleft(int pacsleft) {
+	public void setPacsleft(int pacsleft)  throws RemoteException{
 		this.pacsleft = pacsleft;
 	}
 
-	public int getReqdx() {
+	public int getReqdx()  throws RemoteException{
 		return reqdx;
 	}
 
-	public void setReqdx(int reqdx) {
+	public void setReqdx(int reqdx)  throws RemoteException{
 		this.reqdx = reqdx;
 	}
 
-	public int getReqdy() {
+	public int getReqdy()  throws RemoteException{
 		return reqdy;
 	}
 
-	public void setReqdy(int reqdy) {
+	public void setReqdy(int reqdy)  throws RemoteException{
 		this.reqdy = reqdy;
 	}
 
-	public void DrawPacMan() {
+	public void DrawPacMan()  throws RemoteException{
 		player.DrawPacMan();
 	}
 
-	public void setPlayer(Player p) {
+	public void setPlayer(Player p)  throws RemoteException{
 		player = p;
 	}
 
-	public void drawGhost(int i, int j) {
+	public void drawGhost(int i, int j)  throws RemoteException{
 		player.drawGhost(i, j);
 	}
 
-	public int getPacmanspeed() {
+	public int getPacmanspeed()  throws RemoteException{
 		return pacmanspeed;
 	}
     

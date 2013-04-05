@@ -12,7 +12,7 @@ public class InfoGame {
     private final int nrofblocks = 15;
     private final int scrsize = nrofblocks * blocksize;
     private int nrofghosts = 6;
-    private int deathcounter;
+    private int deathcounter = 0;
     private int[] ghostx, ghosty;
 
     private ArrayList<InfoPlayer> players;
@@ -20,6 +20,17 @@ public class InfoGame {
 	private short[] screendata;
 
     private boolean begin = false;
+
+    public InfoPlayer createInfoPlayer(){
+	    InfoPlayer player = null;
+	    try {
+	    player= new InfoPlayer();
+	    } catch (Exception e) {
+		    e.printStackTrace();
+	    }
+	    return player;
+
+    }
 
     public void setServer(Server s) {
     	server = s;
@@ -124,7 +135,6 @@ public class InfoGame {
 	}
 
 	public void PlayGame() {
-		System.out.println("Play !");
 		server.PlayGame(players);
 	}
 
