@@ -1,4 +1,3 @@
-
 import javax.swing.JFrame;
 import java.rmi.Naming;
 import java.rmi.ConnectException;
