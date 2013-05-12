@@ -7,15 +7,24 @@ public interface I_InfoPlayer extends Remote {
 
 	public String getName() throws RemoteException;
 
-	public void isWinner() throws RemoteException;
+//	public void isWinner() throws RemoteException;
+//
+//	public void isLooser() throws RemoteException;
 
-	public void isLooser() throws RemoteException;
+	//public void reset() throws RemoteException;
 
-	public void reset() throws RemoteException;
-
-    public boolean getIngame() throws RemoteException;
+    public boolean isDead() throws RemoteException;
     
-    public void setIngame(boolean b) throws RemoteException;
+    public void setDead(boolean b) throws RemoteException;
+
+    public boolean isPlaying() throws RemoteException;
+    
+    public void setPlaying(boolean b) throws RemoteException;
+    
+    public boolean isWaiting() throws RemoteException;
+    
+    public void setWaiting(boolean b) throws RemoteException;
+
     
     public boolean getDying() throws RemoteException;
     
@@ -81,21 +90,11 @@ public interface I_InfoPlayer extends Remote {
 	public void setReqdy(int reqdy)  throws RemoteException;
 
 
-	public void DrawPacMan(ArrayList<I_InfoPlayer> players)  throws RemoteException;
-
-
-	public void setPlayer(Player p)  throws RemoteException;
-
-
-	public void drawGhost(int i, int[] j, int[] k)  throws RemoteException;
-
-
-
 	public int getPacmanspeed()  throws RemoteException;
 
-	public void LevelInit() throws RemoteException;
+	public void playerInit()  throws RemoteException;
 
-	public void LevelContinue() throws RemoteException;
+	public void playerInitPos()  throws RemoteException;
 
 
 }

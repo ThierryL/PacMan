@@ -1,5 +1,3 @@
-
-
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.rmi.NotBoundException;
@@ -30,58 +28,118 @@ public class InfoGame  extends UnicastRemoteObject implements I_InfoGame{
 	private short[] screendata;
 
 	private Server server = null;
-    	private boolean begin = false;
-	private int numberPlayer = 0;
-	private int playerWaiting = 0;
-	private int playerInGame = 0;
+
+	private int nbPlayer = 0;
+
+	private int nbPlayerExpected = 1;
+	private int nbPlayerWaiting = 0;
+	private int nbPlayerPlaying = 0;
 
 	private static final long serialVersionUID = 1L;
+	
+	private boolean playing = false;
+	private boolean waiting = true;
+	private boolean ended = false;
+
 
 	protected InfoGame() throws RemoteException {
 		super();
 	}
 	
-	public void setNumberPlayer(int n) {
-		numberPlayer = n;
-	}
-
-	public int getNumberPlayer() {
-		return numberPlayer;
-	}
 
     public void newPlayer(String name) throws RemoteException{
 
-	I_InfoPlayer player = null;
 	try {
-		player = (I_InfoPlayer) Naming.lookup("rmi://localhost:1099/"+name);
+		I_InfoPlayer player = null;
+		player = new InfoPlayer(name);
+		Naming.rebind("rmi://localhost:1099/"+name, player);
 		players.add(player);
-	} catch (NotBoundException e){
-		System.out.println("El servicio no esta publicado en el servidor");
-		System.exit(128);
-	} catch (MalformedURLException e){
-		System.out.println("URL invalida");
-		System.exit(128);
+		nbPlayer += 1;
 	} catch (RemoteException e){
-		System.out.println("Excepcion remota tratanod de conectarse al servidor");
-		System.exit(128); 
+		System.out.println("Hubo una excepcion creando la instancia del objeto distribuido");
+	} catch (MalformedURLException e){
+		System.out.println("URL mal formada al tratar de publicar el objeto");
 	}
+
     }
 
-    public ArrayList<I_InfoPlayer> getPlayers() {
-	    return players;
+    public void moveGhosts() throws RemoteException {
+	    server.moveGhosts();
     }
+
+    public void levelContinue() throws RemoteException {
+	    server.LevelContinue();
+    }
+
+	public  ArrayList<I_InfoPlayer> getPlayers() throws RemoteException {
+		return this.players;
+	}
+
+//	public void setCurrentSpeed(int currentSpeed) throws RemoteException {
+//		this.currentSpeed = currentSpeed;
+//	}
+//
+//	public int getCurrentSpeed() throws RemoteException {
+//		return this.currentSpeed;
+//	}
+//
+//	public int getMaxSpeed() throws RemoteException {
+//		return this.maxSpeed;
+//	}
+//
+//	public int[] getValidSpeeds() throws RemoteException {
+//		return this.validSpeeds;
+//	}
+
+
+	public void setNbPlayerExpected(int n){
+		nbPlayerExpected = n;
+	}
+
+	public int getNbPlayerExpected() throws RemoteException{
+		return nbPlayerExpected;
+	}
+
+	public void setNumberPlayer(int n) {
+		nbPlayer = n;
+	}
+
+	public int getNumberPlayer() {
+		return nbPlayer;
+	}
+
+	public int getNbrPlayerInGame() throws RemoteException{
+		return nbPlayerPlaying;
+	}
+
 
     public void setServer(Server s) {
     	server = s;
 	players = new ArrayList<I_InfoPlayer>();
     }
-    
-    public boolean isBegin() {
-		return begin;
+
+    public boolean isEnded()  throws RemoteException{
+		return ended;
 	}
 
-	public void setBegin(boolean begin) {
-		this.begin = begin;
+	public void setEnded(boolean ended)  throws RemoteException{
+		this.ended = ended;
+	}
+
+    
+    public boolean isPlaying()  throws RemoteException{
+		return playing;
+	}
+
+	public void setPlaying(boolean playing)  throws RemoteException{
+		this.playing = playing;
+	}
+
+    public boolean isWaiting()  throws RemoteException{
+		return waiting;
+	}
+	public void setWaiting(boolean waiting)  throws RemoteException{
+		this.waiting = waiting;
 	}
     
     public void InitScreenData(){
@@ -161,35 +219,61 @@ public class InfoGame  extends UnicastRemoteObject implements I_InfoGame{
 	}
 
 	public void GameInit() {
-		for(int i = 0; i<players.size(); i++)
-			server.GameInit(players.get(i));
+			server.GameInit();
 	}
 
-	public void PlayGame(I_InfoPlayer p) {
-		server.PlayGame(p,players);
-	}
 
 	public boolean checkInit() {
-		if (playerWaiting<numberPlayer) return false;
-		playerInGame = playerWaiting;
 		return true;
+
 	}
 
-	public void addPlayer() {
-		playerWaiting++;
+
+	public void addPlayerWaiting()  throws RemoteException{
+		nbPlayerWaiting++;
+		if(nbPlayerWaiting == nbPlayerExpected){
+			waiting = false;
+			playing = true;
+			nbPlayerPlaying = nbPlayerWaiting;
+			nbPlayerWaiting = 0;
+			for (int i = 0; i<players.size(); i++){
+				if(players.get(i).isWaiting()){
+					players.get(i).setWaiting(false);
+					players.get(i).setPlaying(true);
+				}
+			}
+
+		}
+	}
+
+	public int getNbPlayerWaiting() throws RemoteException{
+		return nbPlayerWaiting;
+	}
+
+	public void addPlayerPlaying()  throws RemoteException{
+		nbPlayerPlaying++;
+	}
+
+	public void removePlayerPlaying()  throws RemoteException{
+		nbPlayerPlaying--;
 	}
 
 	public void finished() {
+		server.finished();
 		try{
-		I_InfoPlayer tmp = players.get(0);
-		for (int i = 0; i<players.size(); i++)
-			if (tmp.getScore() < players.get(i).getScore()) tmp = players.get(i);
-		for (int i = 0; i<players.size(); i++) {
-			if (!tmp.getName().equals(players.get(i).getName())) players.get(i).isLooser();
-			else players.get(i).isWinner();
-		}
-		playerWaiting = 0;
-		playerInGame = 0;
+	//	I_InfoPlayer tmp = players.get(0);
+	//	for (int i = 0; i<players.size(); i++)
+	//		if (tmp.getScore() < players.get(i).getScore()) {
+	//			tmp = players.get(i);
+	//		}
+	//	for (int i = 0; i<players.size(); i++) {
+	//		if (!tmp.getName().equals(players.get(i).getName())){
+	//			players.get(i).isLooser();
+	//	}
+	//		else players.get(i).isWinner();
+	//	}
+		//playerWaiting = 0;
+		//playerInGame = 0;
 		} catch (Exception exc) {
 				exc.printStackTrace();
         	}
@@ -197,36 +281,66 @@ public class InfoGame  extends UnicastRemoteObject implements I_InfoGame{
 
 	public void exit(String name) {
 		try {
-		for (int i=0; i<players.size(); i++) {
- 			String val = players.get(i).getName();
- 			if (val.equals(name)) {
-   				players.remove(i);
-				System.out.println("player in: "+playerInGame+"   player waiting: "+playerWaiting);
-				playerWaiting --;
-				if (playerInGame != 0) {
-					playerInGame--;
-					if (playerInGame<numberPlayer) {
-						for (int k=0; k<players.size(); k++)
-							players.get(k).reset();
-						setBegin(false);
-						server.reset();
-						playerInGame = 0;
-						playerWaiting = 0;
+			int i;
+			for (i=0; i<players.size(); i++) {
+				String val = players.get(i).getName();
+				if (val.equals(name)) {
+					break;
+				}
+			}
+
+			if(players.get(i).isPlaying()){
+				nbPlayerPlaying--;
+			}
+			if(players.get(i).isWaiting()){
+				nbPlayerWaiting--;
+			}
+			nbPlayer--;
+
+			players.remove(i);
+
+			if(playing && (nbPlayerPlaying<nbPlayerExpected)){
+				nbPlayerWaiting = nbPlayerPlaying;
+				nbPlayerPlaying = 0;
+				playing = false;
+				waiting = true;
+				for (int j = 0; j<players.size(); j++){
+					if(players.get(j).isPlaying()){
+						players.get(j).setWaiting(true);
+						players.get(j).setPlaying(false);
 					}
 				}
-				System.out.println("player in: "+playerInGame+"   player waiting: "+playerWaiting);
-   				break;
- 			}
-		}
+			}
 		} catch (Exception exc) {
-				exc.printStackTrace();
+			exc.printStackTrace();
 		}
+
 		try {  
-            		Naming.unbind("rmi://localhost:1099/"+name);  
-        	}  catch (Exception e) {  
-        		System.out.println("Failed To unbind object with the RMI registry");  
-        	} 
+			Naming.unbind("rmi://localhost:1099/"+name);  
+		}  catch (Exception e) {  
+			System.out.println("Failed To unbind object with the RMI registry");  
+		} 
 	}
 
+	public boolean allDead() throws RemoteException{
+
+      		for(int k = 0; k<players.size(); k++){
+			if(players.get(k).isPlaying()){
+				return false;
+			}
+      		}
+		return true;
+	}
+
+	public void restart() throws RemoteException{
+
+      		for(int k = 0; k<players.size(); k++){
+			players.get(k).playerInit();
+      		}
+		server.LevelInit();
+		waiting = true;
+		playing = false;
+		ended = false;
+	}
 }
 

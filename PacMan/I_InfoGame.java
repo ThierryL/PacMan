@@ -1,23 +1,48 @@
 import java.rmi.RemoteException;
 import java.rmi.Remote;
+import java.util.ArrayList;
 
 public interface I_InfoGame extends Remote{
 
     public void newPlayer(String name) throws RemoteException;
 
+    public void moveGhosts() throws RemoteException;
+
+    public void levelContinue() throws RemoteException;
+
+	public  ArrayList<I_InfoPlayer> getPlayers() throws RemoteException;
+
 	public void exit(String name) throws RemoteException;
 	
 	public boolean checkInit() throws RemoteException;
 
-	public void addPlayer() throws RemoteException;
+	public void addPlayerWaiting() throws RemoteException;
+
+	public int getNbPlayerWaiting() throws RemoteException;
+
+	public void addPlayerPlaying() throws RemoteException;
+	
+	public void removePlayerPlaying() throws RemoteException;
+
+	public int getNbPlayerExpected() throws RemoteException;
+
+	public int getNbrPlayerInGame() throws RemoteException;
 	
 	public void finished() throws RemoteException;
 
     public void setServer(Server s) throws RemoteException;
-    
-    public boolean isBegin() throws RemoteException;
 
-	public void setBegin(boolean begin) throws RemoteException;
+    public boolean isEnded()  throws RemoteException;
+
+	public void setEnded(boolean ended)  throws RemoteException;
+    
+    public boolean isPlaying() throws RemoteException;
+
+	public void setPlaying(boolean playing) throws RemoteException;
+    
+    public boolean isWaiting() throws RemoteException;
+
+	public void setWaiting(boolean waiting) throws RemoteException;
     
     public void InitScreenData() throws RemoteException;
     
@@ -53,5 +78,7 @@ public interface I_InfoGame extends Remote{
 
 	public void GameInit() throws RemoteException;
 
-	public void PlayGame(I_InfoPlayer p) throws RemoteException;
+	public boolean allDead() throws RemoteException;
+
+	public void restart() throws RemoteException;
 }

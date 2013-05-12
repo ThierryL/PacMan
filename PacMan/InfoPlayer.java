@@ -10,14 +10,19 @@ public class InfoPlayer extends UnicastRemoteObject implements I_InfoPlayer{
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private boolean ingame = false;
     private boolean dying = false;
     private final int pacmanspeed = 6;
     private int pacsleft, score;
     private int pacmanx, pacmany, pacmandx, pacmandy;
-    private Player player = null;
     
     private int viewdx, viewdy, reqdx, reqdy;
+
+    private final int blocksize = 24;
+
+    boolean playing = false;
+    boolean waiting = false;
+    boolean dead = false;
+
 	private String name="";
 
 	public void setName(String s) {
@@ -28,17 +33,34 @@ public class InfoPlayer extends UnicastRemoteObject implements I_InfoPlayer{
 		return name;
 	}
 
-    public InfoPlayer() throws RemoteException{
+    public InfoPlayer(String name) throws RemoteException{
 	    super();
+	    this.name = name;
     }
 
     
-    public boolean getIngame() throws RemoteException{
-    	return ingame;
+    public boolean isDead() throws RemoteException{
+    	return dead;
     }
     
-    public void setIngame(boolean b) throws RemoteException{
-    	ingame = b;
+    public void setDead(boolean b) throws RemoteException{
+    	dead = b;
+    }
+    
+    public boolean isPlaying() throws RemoteException{
+    	return playing;
+    }
+    
+    public void setPlaying(boolean b) throws RemoteException{
+    	playing = b;
+    }
+    
+    public boolean isWaiting() throws RemoteException{
+    	return waiting;
+    }
+    
+    public void setWaiting(boolean b) throws RemoteException{
+    	waiting = b;
     }
 
     public boolean getDying() throws RemoteException{
@@ -129,40 +151,33 @@ public class InfoPlayer extends UnicastRemoteObject implements I_InfoPlayer{
 		this.reqdy = reqdy;
 	}
 
-	public void DrawPacMan(ArrayList<I_InfoPlayer> players)  throws RemoteException{
-		player.DrawPacMan(players);
-	}
 
-	public void setPlayer(Player p)  throws RemoteException{
-		player = p;
-	}
-
-	public void drawGhost(int n, int[] x, int[] y)  throws RemoteException{
-		for(int k = 0; k<n; k++) player.drawGhost(x[k] + 1, y[k] + 1);
-	}
 
 	public int getPacmanspeed()  throws RemoteException{
 		return pacmanspeed;
 	}
 
-	public void LevelInit() throws RemoteException{
-		player.LevelInit();
-	}
-    
-	public void LevelContinue() throws RemoteException{
-		player.LevelContinue();
+	public void playerInit()  throws RemoteException{
+		pacsleft = 3;
+		score = 0;
+		pacmanx = 7 * blocksize;
+		pacmany = 11 * blocksize;
+		pacmandx = 0;
+		pacmandy = 0;
+		viewdx = -1;
+		viewdy = 0;
+		dying = false;
+		waiting = false;
+		playing = false;
+		dead = false;
 	}
 
-	public void isWinner() {
-		player.win();
-	}
-	
-	public void isLooser() {
-		player.loose();
-	}
-	
-	public void reset() {
-		ingame = false;
-		player.GameInit();
+	public void playerInitPos()  throws RemoteException{
+		pacmanx = 7 * blocksize;
+		pacmany = 11 * blocksize;
+		pacmandx = 0;
+		pacmandy = 0;
+		viewdx = -1;
+		viewdy = 0;
 	}
 }

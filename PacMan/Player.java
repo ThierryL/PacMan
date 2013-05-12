@@ -1,4 +1,3 @@
-
 import javax.swing.ImageIcon;
 import java.util.ArrayList;
 import javax.swing.JPanel;
@@ -45,7 +44,7 @@ public class Player extends JPanel implements ActionListener {
 	int pacanimdir = 1;
 	int pacmananimpos = 0;
 
-	private InfoPlayer player;
+	private I_InfoPlayer player;
 	private Graphics2D g2d;
 	private static I_InfoGame game = null;
 	private static String name = "";
@@ -67,18 +66,28 @@ public class Player extends JPanel implements ActionListener {
 
 	public Player(I_InfoGame g) {
 
-			game = g;
+		game = g;
+		String playerName = "Player" + (int)(Math.random()*1000);
 
 		try {
-			player = new InfoPlayer();
-			player.setPlayer(this);
-			player.setName("Player" + (int)(Math.random()*1000));
-			Naming.rebind("rmi://localhost:1099/"+player.getName(), player);
-			game.newPlayer(player.getName());
-		} catch (RemoteException e){
-			System.out.println("Hubo una excepcion creando la instancia del objeto distribuido");
+			game.newPlayer(playerName);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+
+		try {
+			player = (I_InfoPlayer) Naming.lookup("rmi://localhost:1099/"+playerName);
+		} catch (NotBoundException e){
+			System.out.println("El servicio no esta publicado en el servidor");
+			System.exit(128);
 		} catch (MalformedURLException e){
-			System.out.println("URL mal formada al tratar de publicar el objeto");
+			System.out.println("URL invalida");
+			System.exit(128);
+		} catch (RemoteException e){
+			System.out.println("Excepcion remota tratanod de conectarse al servidor");
+			System.exit(128); 
 		}
 
 
@@ -100,8 +109,8 @@ public class Player extends JPanel implements ActionListener {
 	public void addNotify() {
 		super.addNotify();
 		try {
-			if (!player.getIngame()){
-				GameInit();
+			player.playerInit();
+			if (!game.isPlaying()){
 				game.GameInit();
 			}
 
@@ -111,38 +120,38 @@ public class Player extends JPanel implements ActionListener {
 
 	}
 
-	public void GameInit(){
-		win = false;
-		try {
-			player.setPacsleft(3);
-			player.setScore(0);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+	//All this functions are replaced by player.playerInit();
+//	public void GameInit(){
+//		win = false;
+//		try {
+//			player.setPacsleft(3);
+//			player.setScore(0);
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//
+//			LevelInit();
+//	}
+//
+//	public void LevelInit(){
+//		LevelContinue();
+//	}
+//
+//	public void LevelContinue(){
+//
+//		try{
+//			player.setPacmanx(7 * game.getBlocksize());
+//			player.setPacmany(11 * game.getBlocksize());
+//			player.setPacmandx(0);
+//			player.setPacmandy(0);
+//			player.setViewdx(-1);
+//			player.setViewdy(0);
+//			player.setDying(false);
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//	}
 
-			LevelInit();
-	}
-
-	public void LevelInit(){
-		LevelContinue();
-	}
-
-	public void LevelContinue(){
-
-		try{
-			player.setPacmanx(7 * game.getBlocksize());
-			player.setPacmany(11 * game.getBlocksize());
-			player.setPacmandx(0);
-			player.setPacmandy(0);
-			player.setViewdx(-1);
-			player.setViewdy(0);
-			player.setDying(false);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-
-	}
 
 
 	public void DoAnim() {
@@ -166,7 +175,7 @@ public class Player extends JPanel implements ActionListener {
 			g2d.setColor(Color.white);
 			g2d.drawRect(50, scrsize / 2 - 30, scrsize - 100, 50);
 
-			String s = "Press s to start to begin again, q to quit";
+			String s = "Press s to start again, q to quit";
 			Font small = new Font("Helvetica", Font.BOLD, 14);
 			FontMetrics metr = this.getFontMetrics(small);
 
@@ -178,6 +187,26 @@ public class Player extends JPanel implements ActionListener {
 		}
 	}
 
+	public void ShowDeadScreen() {
+		try{
+			int scrsize = game.getScrsize();
+
+			g2d.setColor(new Color(0, 32, 48));
+			g2d.fillRect(50, scrsize / 2 - 30, scrsize - 100, 50);
+			g2d.setColor(Color.white);
+			g2d.drawRect(50, scrsize / 2 - 30, scrsize - 100, 50);
+
+			String s = "You are dead";
+			Font small = new Font("Helvetica", Font.BOLD, 14);
+			FontMetrics metr = this.getFontMetrics(small);
+
+			g2d.setColor(Color.white);
+			g2d.setFont(small);
+			g2d.drawString(s, (scrsize - metr.stringWidth(s)) / 2, scrsize / 2);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 
 	public void ShowIntroScreen() {
 		try{
@@ -189,6 +218,29 @@ public class Player extends JPanel implements ActionListener {
 			g2d.drawRect(50, scrsize / 2 - 30, scrsize - 100, 50);
 			
 			String s = "Press s to start.";
+			Font small = new Font("Helvetica", Font.BOLD, 14);
+			FontMetrics metr = this.getFontMetrics(small);
+
+			g2d.setColor(Color.white);
+			g2d.setFont(small);
+			g2d.drawString(s, (scrsize - metr.stringWidth(s)) / 2, scrsize / 2);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void ShowWaitingScreen() {
+		try{
+			int scrsize = game.getScrsize();
+			int n = game.getNbPlayerExpected() - game.getNbPlayerWaiting();
+			
+
+			g2d.setColor(new Color(0, 32, 48));
+			g2d.fillRect(50, scrsize / 2 - 30, scrsize - 100, 50);
+			g2d.setColor(Color.white);
+			g2d.drawRect(50, scrsize / 2 - 30, scrsize - 100, 50);
+			
+			String s = "Waiting for " + n + " others players";
 			Font small = new Font("Helvetica", Font.BOLD, 14);
 			FontMetrics metr = this.getFontMetrics(small);
 
@@ -229,14 +281,27 @@ public class Player extends JPanel implements ActionListener {
 	}
 
 
-	public void drawGhost(int x, int y) {
-		g2d.drawImage(ghost, x, y, this);
+	public void drawGhost() {
+
+		try{
+			int nbrGhosts = game.getNrofghosts();
+			int[] ghostX = game.getGhostx();
+			int[] ghostY = game.getGhosty();
+
+			for(int k = 0; k<nbrGhosts; k++){
+				g2d.drawImage(ghost, ghostX[k]+1, ghostY[k]+1, this);
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
-	public void DrawPacMan(ArrayList<I_InfoPlayer> players) {
+	public void DrawPacMan() {
 		try{
+		ArrayList<I_InfoPlayer> players = game.getPlayers();
 			for(int i = 0; i<players.size(); i++) {
-				if (players.get(i).getIngame()) {
+				if (players.get(i).isPlaying()) {
 					if (players.get(i).getViewdx() == -1)
 						DrawPacManLeft(players.get(i));
 					else if (players.get(i).getViewdx() == 1)
@@ -430,11 +495,19 @@ public class Player extends JPanel implements ActionListener {
 		DrawScore();
 		DoAnim();
 		try {
-			if(end) ShowEndScreen();
-			else if (player.getIngame())
-				game.PlayGame(player);
-			else
+			if(game.isEnded() && !game.isWaiting()) {
+				ShowEndScreen();
+			} else if (game.isPlaying() && player.isPlaying()){
+				PlayGame();
+			} else if (game.isPlaying() && player.isDead()){
+				drawGhost();
+				DrawPacMan();
+				ShowDeadScreen();
+			} else if (game.isWaiting()&& player.isWaiting()){
+				ShowWaitingScreen();
+			} else {
 				ShowIntroScreen();
+			}
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -448,6 +521,168 @@ public class Player extends JPanel implements ActionListener {
 		g.dispose();
 	}
 
+	public void PlayGame(){
+		try {
+
+				if (player.getDying()) {
+					Death();
+				} else {
+					MovePacMan();
+					DrawPacMan();
+					game.moveGhosts();
+					CheckPlayerKilled();
+					drawGhost();
+					CheckMaze();
+				}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	public void CheckMaze() {
+		short i = 0;
+		boolean finished = true;
+		try {
+			int nrofblocks = game.getNrofblocks();
+			int nrofghosts = game.getNrofghosts();
+
+			while (i < nrofblocks * nrofblocks && finished) {
+				if ((game.getScreendata()[i] & 48) != 0)
+					finished = false;
+				i++;
+			}
+
+			if (finished) {
+				player.setScore(player.getScore()+50);
+				/*
+				if (nrofghosts < maxghosts)
+					game.setNrofghosts(nrofghosts++);
+				if (currentspeed < maxspeed)
+					currentspeed++;
+				ArrayList<I_InfoPlayer> players = game.getPlayers();
+				LevelInit();
+				for(int k = 0; k<players.size(); k++){
+					players.get(k).LevelInit();
+				}*/
+
+				game.finished();
+
+
+				
+			}
+		} catch (Exception e) {
+			e.printStackTrace();	
+		}
+	}
+
+	public void CheckPlayerKilled() {
+		short i;
+		try {
+			int[] ghosty = game.getGhosty();
+			int[] ghostx = game.getGhostx();
+			int nrofghosts = game.getNrofghosts();
+
+
+
+			for (i = 0; i < nrofghosts; i++) {
+
+				if (player.getPacmanx() > (ghostx[i] - 12) && player.getPacmanx() < (ghostx[i] + 12) &&
+						player.getPacmany() > (ghosty[i] - 12) && player.getPacmany() < (ghosty[i] + 12) &&
+						player.isPlaying()) {
+
+						player.setDying(true);
+						game.setDeathcounter(game.getDeathcounter() +64);
+
+							}
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+		}
+
+	public void MovePacMan() {
+		int pos;
+		short ch;
+
+		try {
+			int blocksize = game.getBlocksize();
+			int nrofblocks = game.getNrofblocks();
+			short[] screendata = game.getScreendata();
+
+			int reqdx = player.getReqdx();
+			int reqdy = player.getReqdy();
+
+
+			if (reqdx == -player.getPacmandx() && reqdy == -player.getPacmandy()) {
+				player.setPacmandx(reqdx);
+				player.setPacmandy(reqdy);
+				player.setViewdx(reqdx);
+				player.setViewdy(reqdy);
+			}
+			if (player.getPacmanx() % blocksize == 0 && player.getPacmany() % blocksize == 0) {
+				pos = player.getPacmanx() / blocksize + nrofblocks * (int)(player.getPacmany() / blocksize);
+				ch = screendata[pos];
+
+				if ((ch & 16) != 0) {
+					game.setScreendata((short)(ch & 15),pos);
+					player.setScore(player.getScore()+1);
+				}
+
+				if (reqdx != 0 || reqdy != 0) {
+					if (!((reqdx == -1 && reqdy == 0 && (ch & 1) != 0) ||
+							(reqdx == 1 && reqdy == 0 && (ch & 4) != 0) ||
+							(reqdx == 0 && reqdy == -1 && (ch & 2) != 0) ||
+							(reqdx == 0 && reqdy == 1 && (ch & 8) != 0))) {
+						player.setPacmandx(reqdx);
+						player.setPacmandy(reqdy);
+						player.setViewdx(reqdx);
+						player.setViewdy(reqdy);
+					}
+				}
+
+				// Check for standstill
+				if ((player.getPacmandx() == -1 && player.getPacmandy() == 0 && (ch & 1) != 0) ||
+						(player.getPacmandx() == 1 && player.getPacmandy() == 0 && (ch & 4) != 0) ||
+						(player.getPacmandx() == 0 && player.getPacmandy() == -1 && (ch & 2) != 0) ||
+						(player.getPacmandx() == 0 && player.getPacmandy() == 1 && (ch & 8) != 0)) {
+					player.setPacmandx(0);
+					player.setPacmandy(0);
+				}
+			}
+			player.setPacmanx(player.getPacmanx() + player.getPacmanspeed() * player.getPacmandx());
+			player.setPacmany(player.getPacmany() + player.getPacmanspeed() * player.getPacmandy());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void Death() {
+		try {
+			
+			player.setPacsleft(player.getPacsleft()-1);
+			if (player.getPacsleft() == 0){
+				player.setPlaying(false);
+				player.setWaiting(false);
+				player.setDead(true);
+				game.removePlayerPlaying();
+			}
+			player.setDying(false);
+			player.playerInitPos();
+
+			//We check if everyone is dead or not
+			if (game.allDead() == true) {
+				game.levelContinue();
+				game.setEnded(true);
+				game.setPlaying(false);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
 	public void exit() {
 		try{
 		game.exit(player.getName());
@@ -457,23 +692,23 @@ public class Player extends JPanel implements ActionListener {
 	}
 
 	public void win() {
-		win = true;
-		end = true;
-		try {
-		player.setIngame(false);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+	//	win = true;
+	//	end = true;
+	//	try {
+	//	player.setIngame(false);
+	//	} catch (Exception e) {
+	//		e.printStackTrace();
+	//	}
 	}
 
 	public void loose() {
-		win = false;
-		end = true;
-		try {
-		player.setIngame(false);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+	//	win = false;
+	//	end = true;
+	//	try {
+	//	player.setIngame(false);
+	//	} catch (Exception e) {
+	//		e.printStackTrace();
+	//	}
 	}
 
 	class TAdapter extends KeyAdapter {
@@ -483,7 +718,7 @@ public class Player extends JPanel implements ActionListener {
 			int reqdx = 0;
 			int reqdy = 0;
 			try {
-				if (player.getIngame())
+				if (player.isPlaying())
 				{
 					if (key == KeyEvent.VK_LEFT)
 					{
@@ -515,7 +750,9 @@ public class Player extends JPanel implements ActionListener {
 					}
 					else if (key == KeyEvent.VK_ESCAPE && timer.isRunning())
 					{
-						player.setIngame(false);
+						exit();
+						System.out.println("ESC");
+						System.exit(0);
 					}
 					else if (key == KeyEvent.VK_PAUSE) {
 						if (timer.isRunning())
@@ -529,24 +766,25 @@ public class Player extends JPanel implements ActionListener {
 				{
 					if (key == 's' || key == 'S')
 					{
-						if (end) end = false;
-						if (!game.isBegin()) {
-							player.setIngame(true);
-							GameInit();
-							game.addPlayer();
-							waiting = true;
-							while(!game.checkInit());
-							waiting = false;
-							game.GameInit();
+						if (game.isWaiting()&&!player.isWaiting()) {
+							player.playerInit();
+							player.setWaiting(true);
+							game.addPlayerWaiting();
+						} else if(game.isPlaying()){
+							player.playerInit();
+							player.setPlaying(true);
+							game.addPlayerPlaying();
+						} else if(game.isEnded()){
+							game.restart();
+
 						}
 					}
-				}
 					if (key == KeyEvent.VK_Q)
 					{
-						player.setIngame(false);
 						exit();
 						System.exit(0);
 					}
+				}
 
 			} catch (Exception exc) {
 				exc.printStackTrace();
