@@ -1,4 +1,3 @@
-
 import java.rmi.Naming;
 import java.rmi.ConnectException;
 import java.rmi.RemoteException;
