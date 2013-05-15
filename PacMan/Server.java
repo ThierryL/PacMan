@@ -140,8 +140,6 @@ public class Server {
 
 	public void GameInit() {
 		if (!isInitialized){
-			//	if (!playing) {
-			//		playing = true;
 			LevelInit();
 			try {
 				game.setNrofghosts(6);
@@ -149,7 +147,6 @@ public class Server {
 				e.printStackTrace();
 			}
 			currentspeed = 3;
-			//}
 		}
 	}
 
@@ -198,7 +195,116 @@ public class Server {
 	}
 
 
+	public void finished() {
+		int numberPlayer = game.getNumberPlayer();
+		numberFinished += 1;
+		if(numberFinished == numberPlayer){
+			//Ghosts update
+			int nrOfGhosts = game.getNrofghosts();
+				if (nrOfGhosts < maxghosts){
+					game.setNrofghosts(nrOfGhosts++);
+				}
+				if (currentspeed < maxspeed){
+					currentspeed++;
+				}
+				LevelInit();
+		}
+	}
+
+	/*
+	 *function who transformed all the caracteristic of InfoGame in a string
+	 *to sent them at the new server
+	 */
+	public String infoGame(){
+		String info = "";
+		try{
+		info = Integer.toString(game.getNrofghosts());
+		info += " " + Integer.toString(game.getDeathcounter());
+		int[] ghostx = game.getGhostx();
+		for (int i = 0; i < game.getNrofghosts(); i++) {
+			info += " " + Integer.toString(ghostx[i]);
+		}
+		int[] ghosty = game.getGhosty();
+		for (int i = 0; i < game.getNrofghosts(); i++) {
+			info += " " + Integer.toString(ghosty[i]);
+		}
+		short[] screenData = game.getScreendata();
+		for (int i = 0; i < screenData.length; i++) {
+			info += " " + Integer.toString(screenData[i]);
+		}
+		info += " " + Integer.toString(game.getNumberPlayer());
+		info += " " + Integer.toString(game.getNbPlayerExpected());
+		info += " " + Integer.toString(game.getNbPlayerWaiting());
+		info += " " + Integer.toString(game.getNbrPlayerInGame());
+		info += " " + String.valueOf(game.isPlaying());
+		info += " " + String.valueOf(game.isWaiting());
+		info += " " + String.valueOf(game.isEnded());
+		} catch (Exception exc) {
+			exc.printStackTrace();
+		}
+		return info;
+	}
 	
+	/*
+	 *function who transformed all the caracteristic of player in a string
+	 *to sent them at the new server
+	 */
+	public String infoPlayer(I_InfoPlayer player){
+		String info = "";
+		try{
+		info = Integer.toString(player.getPacmanspeed());
+		info += " " + Integer.toString(player.getPacsleft());
+		info += " " + Integer.toString(player.getScore());
+		info += " " + Integer.toString(player.getPacmanx());
+		info += " " + Integer.toString(player.getPacmany());
+		info += " " + Integer.toString(player.getPacmandx());
+		info += " " + Integer.toString(player.getPacmandy());
+		info += " " + Integer.toString(player.getViewdx());
+		info += " " + Integer.toString(player.getViewdy());
+		info += " " + Integer.toString(player.getReqdx());
+		info += " " + Integer.toString(player.getReqdy());
+		info += " " + String.valueOf(player.getDying());
+		info += " " + String.valueOf(player.isPlaying());
+		info += " " + String.valueOf(player.isWaiting());
+		info += " " + String.valueOf(player.isDead());
+		info += " " + player.getName();
+		} catch (Exception exc) {
+			exc.printStackTrace();
+		}
+		return info;
+	}
+
+	public String InfoComplete(){
+		String info = "";
+		try{
+			//Board
+			info = infoGame();
+
+			//Players
+			ArrayList<I_InfoPlayer> players = game.getPlayers();
+			for (int i = 0; i<players.size(); i++){
+				info += "%%%" + infoPlayer(players.get(i));
+			}
+		} catch (Exception exc) {
+			exc.printStackTrace();
+		}
+		return info;
+	}
+
+
+	public void reconstruction(String info){
+		// Establecimiento del stub en el rmiserver
+			game = new InfoGame();
+
+			String[] infoComplete = info.split("%%%");
+			game.reconstruction(infoComplete[0]);
+			game.createPlayers(infoComplete[1]);
+
+
+	}
+
+
+
 	public static void main(String[] args){
 		// Establecimiento del stub en el rmiserver
 		try{
@@ -221,19 +327,4 @@ public class Server {
 
 	}
 
-	public void finished() {
-		int numberPlayer = game.getNumberPlayer();
-		numberFinished += 1;
-		if(numberFinished == numberPlayer){
-			//Ghosts update
-			int nrOfGhosts = game.getNrofghosts();
-				if (nrOfGhosts < maxghosts){
-					game.setNrofghosts(nrOfGhosts++);
-				}
-				if (currentspeed < maxspeed){
-					currentspeed++;
-				}
-				LevelInit();
-		}
-	}
 }
