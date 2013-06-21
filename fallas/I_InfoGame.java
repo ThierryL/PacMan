@@ -40,6 +40,10 @@ public interface I_InfoGame extends Remote{
 
 	public void setPlaying(boolean playing) throws RemoteException;
     
+    public boolean isPause() throws RemoteException;
+
+	public void setPause(boolean playing) throws RemoteException;
+
     public boolean isWaiting() throws RemoteException;
 
 	public void setWaiting(boolean waiting) throws RemoteException;
