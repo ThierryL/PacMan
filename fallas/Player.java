@@ -69,11 +69,15 @@ public class Player extends JPanel implements ActionListener {
 	Timer timer;
 
 
-	public Player(I_InfoGame g, String addr) {
+	public Player(I_InfoGame g, String addr, String namePlayer) {
 
 		game = g;
 		currentAddress = addr;
-		playerName = "Player" + (int)(Math.random()*1000);
+		if (namePlayer.equals("")){
+			playerName = "Player" + (int)(Math.random()*1000);
+		}else{
+			playerName=namePlayer;
+		}
 
 		try {
 			game.newPlayer(playerName);

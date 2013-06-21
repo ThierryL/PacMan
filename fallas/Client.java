@@ -11,8 +11,8 @@ public class Client extends JFrame
 	private Player player;
 	private static String currentAddress;
 	
-	public Client(){
-			player = new Player(game,currentAddress);
+	public Client(String namePlayer){
+			player = new Player(game,currentAddress, namePlayer);
 			add(player);
 			setTitle("Pacman");
 			setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -22,11 +22,16 @@ public class Client extends JFrame
 	}
 	
 	static public void main(String[] args){
-		if (args.length != 1) {
+		String namePlayer = "";
+		if (args.length == 1) {
+			currentAddress = args[0];
+		}else if (args.length == 2) {
+			currentAddress = args[0];
+			namePlayer=args[1];
+		}else{
 			System.out.println("Wrong number of argument");
 			System.exit(1);
 		}
-		currentAddress = args[0];
 
 		try{
 			game = (I_InfoGame) Naming.lookup("rmi://"+currentAddress+":1099/I_InfoGame");
@@ -41,6 +46,6 @@ public class Client extends JFrame
 			System.exit(128);
 		}
 
-		new Client();
+		new Client(namePlayer);
 	}
 }

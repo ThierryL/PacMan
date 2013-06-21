@@ -229,16 +229,35 @@ public class InfoGame  extends UnicastRemoteObject implements I_InfoGame{
     public void newPlayer(String name) throws RemoteException{
 
 	try {
-		I_InfoPlayer player = null;
-		player = new InfoPlayer(name);
-		Naming.rebind("rmi://"+serverAddress+":1099/"+name, player);
-		players.add(player);
-		nbPlayer += 1;
+
+		I_InfoPlayer player = findPlayer(name);
+		if (player==null){
+			player = new InfoPlayer(name);
+			Naming.rebind("rmi://"+serverAddress+":1099/"+name, player);
+			players.add(player);
+			nbPlayer += 1;
+		}
 	} catch (RemoteException e){
 		System.out.println("Hubo una excepcion creando la instancia del objeto distribuido");
 	} catch (MalformedURLException e){
 		System.out.println("URL mal formada al tratar de publicar el objeto");
 	}
+
+    }
+
+    public I_InfoPlayer findPlayer(String name){
+	    I_InfoPlayer p=null;
+	    try {
+		    for (int i = 0; i<players.size(); i++){
+			    if(players.get(i).getName().equals(name)) {
+				    p=players.get(i);
+				    break;
+			    }
+		    }
+	    } catch (Exception exc) {
+		    exc.printStackTrace();
+	    }
+	    return p;
 
     }
 
