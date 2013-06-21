@@ -230,8 +230,9 @@ public class InfoGame  extends UnicastRemoteObject implements I_InfoGame{
 
 	try {
 
+		I_InfoPlayer player;
 		//I_InfoPlayer player = findPlayer(name);
-		i//f (player==null){
+		//if (player==null){
 			player = new InfoPlayer(name);
 			Naming.rebind("rmi://"+serverAddress+":1099/"+name, player);
 			players.add(player);
