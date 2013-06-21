@@ -69,10 +69,22 @@ public class Player extends JPanel implements ActionListener {
 	Timer timer;
 
 
-	public Player(I_InfoGame g, String addr) {
-
-		game = g;
+	public Player(String addr) {
+        
 		currentAddress = addr;
+        try{
+			game = (I_InfoGame) Naming.lookup("rmi://"+currentAddress+":1099/I_InfoGame");
+		} catch (NotBoundException e){
+			System.out.println("El servicio no esta publicado en el servidor");
+			System.exit(128);
+		} catch (MalformedURLException e){
+			System.out.println("URL invalida");
+			System.exit(128);
+		} catch (RemoteException e){
+			System.out.println("Excepcion remota tratanod de conectarse al servidor");
+			System.exit(128);
+		}
+        
 		playerName = "Player" + (int)(Math.random()*1000);
 
 		try {
