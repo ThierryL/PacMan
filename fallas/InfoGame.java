@@ -41,6 +41,7 @@ public class InfoGame  extends UnicastRemoteObject implements I_InfoGame{
 	private boolean waiting = true;
 	private boolean ended = false;
 	private boolean pause = false;
+	private String playerCallPause;
 
 	private String newAddress = "";
 	private boolean moving = false;
@@ -315,8 +316,18 @@ public class InfoGame  extends UnicastRemoteObject implements I_InfoGame{
 		return pause;
 	}
 
-	public void setPause(boolean pause)  throws RemoteException{
-		this.pause = pause;
+	public void setPause(boolean pause, String player)  throws RemoteException{
+		if (!this.pause){
+			this.pause = pause;
+			this.playerCallPause = player;
+		}else if (player.equals(playerCallPause)){
+			this.pause=pause;
+		}
+			
+	}
+
+	public String getPlayerCallPause() throws RemoteException{
+		return playerCallPause;
 	}
 	
     public boolean isWaiting()  throws RemoteException{

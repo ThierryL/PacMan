@@ -174,6 +174,8 @@ public class Player extends JPanel implements ActionListener {
 
 	public void ShowPauseScreen() {
 		try{
+			String playerCallPause = game.getPlayerCallPause();
+
 			int scrsize = game.getScrsize();
 
 			g2d.setColor(new Color(0, 32, 48));
@@ -181,13 +183,23 @@ public class Player extends JPanel implements ActionListener {
 			g2d.setColor(Color.white);
 			g2d.drawRect(50, scrsize / 2 - 30, scrsize - 100, 50);
 
-			String s = "Game in Pause, press space to play";
+			String s;
+			String s1;
+			if (playerCallPause.equals(playerName)){
+				s ="              Pause        ";
+				s1="Press space to relaunch";
+			}else{
+				s = playerCallPause + " has called a pause";
+				s1 ="              Please wait";
+
+			}
 			Font small = new Font("Helvetica", Font.BOLD, 14);
 			FontMetrics metr = this.getFontMetrics(small);
 
 			g2d.setColor(Color.white);
 			g2d.setFont(small);
-			g2d.drawString(s, (scrsize - metr.stringWidth(s)) / 2, scrsize / 2);
+			g2d.drawString(s, (scrsize - metr.stringWidth(s)) / 2, scrsize / 2 -10);
+			g2d.drawString(s1, (scrsize - metr.stringWidth(s)) / 2, scrsize / 2 +10);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -841,9 +853,9 @@ public class Player extends JPanel implements ActionListener {
 					}
 					else if (key == KeyEvent.VK_SPACE) {
 						if (game.isPause())
-							game.setPause(false);
+							game.setPause(false, playerName);
 						else {
-							game.setPause(true);
+							game.setPause(true, playerName);
 						}
 					}
 				}
