@@ -12,7 +12,7 @@ public class Client extends JFrame
 	private static String currentAddress;
 	
 	public Client(String namePlayer){
-			player = new Player(game,currentAddress, namePlayer);
+			player = new Player(currentAddress, namePlayer);
 			add(player);
 			setTitle("Pacman");
 			setDefaultCloseOperation(EXIT_ON_CLOSE);
