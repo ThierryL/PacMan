@@ -104,8 +104,10 @@ public class InfoGame  extends UnicastRemoteObject implements I_InfoGame{
 			cont++;
 		ended = Boolean.valueOf(infos[cont]);
 			cont++;
-
-
+		pause = Boolean.valueOf(infos[cont]);
+			cont++;
+		playerCallPause = infos[cont];
+			cont++;
 
 	}
 

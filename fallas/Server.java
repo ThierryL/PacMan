@@ -436,6 +436,8 @@ public class Server{
 		info += " " + String.valueOf(game.isPlaying());
 		info += " " + String.valueOf(game.isWaiting());
 		info += " " + String.valueOf(game.isEnded());
+		info += " " + String.valueOf(game.isPause());
+		info += " " + game.getPlayerCallPause();
 		} catch (Exception exc) {
 			exc.printStackTrace();
 		}
@@ -492,6 +494,7 @@ public class Server{
 			for (int i = 0; i < game.getNrofghosts(); i++) {
 				info += " " + Integer.toString(ghostspeed[i]);
 			}
+
 		} catch (Exception exc) {
 			exc.printStackTrace();
 		}
