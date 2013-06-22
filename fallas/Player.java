@@ -657,6 +657,8 @@ public class Player extends JPanel implements ActionListener {
 				CheckMaze();
 			}
 
+			game.saveConf(playerName);
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

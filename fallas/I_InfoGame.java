@@ -117,4 +117,6 @@ public interface I_InfoGame extends Remote{
 	public boolean allConnected() throws RemoteException;
 
 	public int getClientPort() throws RemoteException;
+	
+	public void saveConf(String name) throws RemoteException;
 }

@@ -24,6 +24,7 @@ public class InfoGame  extends UnicastRemoteObject implements I_InfoGame{
     private int[] ghostx, ghosty;
 
     private ArrayList<I_InfoPlayer> players = null;
+    private ArrayList<I_InfoPlayer> saveStatePlayers = null;
 
 	private short[] screendata;
 
@@ -120,6 +121,7 @@ public class InfoGame  extends UnicastRemoteObject implements I_InfoGame{
 		try {
 			player = new InfoPlayer(namePlayer);
 			players.add(player);
+			saveStatePlayers.add(player);
 
 			int cont = 0;
 			player.setPacsleft(Integer.valueOf(infos[cont]));
@@ -236,6 +238,7 @@ public class InfoGame  extends UnicastRemoteObject implements I_InfoGame{
 			player = new InfoPlayer(name);
 			Naming.rebind("rmi://"+serverAddress+":1099/"+name, player);
 			players.add(player);
+			saveStatePlayers.add(player);
 			nbPlayer += 1;
 		//}
 	} catch (RemoteException e){
@@ -315,6 +318,7 @@ public class InfoGame  extends UnicastRemoteObject implements I_InfoGame{
     public void setServer(Server s) {
     	server = s;
 	players = new ArrayList<I_InfoPlayer>();
+	saveStatePlayers = new ArrayList<I_InfoPlayer>();
     }
 
     public boolean isEnded()  throws RemoteException{
@@ -516,6 +520,7 @@ public class InfoGame  extends UnicastRemoteObject implements I_InfoGame{
 			nbPlayer--;
 
 			players.remove(i);
+			saveStatePlayers.remove(i);
 
 			if(playing && (nbPlayerPlaying<nbPlayerExpected)){
 				nbPlayerWaiting = nbPlayerPlaying;
@@ -564,5 +569,16 @@ public class InfoGame  extends UnicastRemoteObject implements I_InfoGame{
 	public int getClientPort() throws RemoteException{
 		return server.getClientPort();
 	}
+
+	public void saveConf(String name) throws RemoteException{
+		    for (int i = 0; i<players.size(); i++){
+			    if(players.get(i).getName().equals(name)) {
+				    saveStatePlayers.set(i, players.get(i));
+				    break;
+			    }
+		    }
+
+	}
+
 }
 
