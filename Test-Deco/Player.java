@@ -94,8 +94,17 @@ public class Player extends JPanel implements ActionListener {
 		}
 
 		try {
-			player = game.newPlayer(playerName);
-        } catch (NotBoundException e){
+			game.newPlayer(playerName);
+        } catch (RemoteException re){
+            reconnect();
+		} catch (Exception e) {
+			System.out.println("Exception");
+		}
+
+
+		try {
+			player = (I_InfoPlayer) Naming.lookup("rmi://"+currentAddress+":1099/"+playerName);
+		} catch (NotBoundException e){
 			System.out.println("El servicio no esta publicado en el servidor");
 			System.exit(128);
 		} catch (MalformedURLException e){
@@ -103,7 +112,7 @@ public class Player extends JPanel implements ActionListener {
 			System.exit(128);
 		} catch (RemoteException e){
 			System.out.println("Excepcion remota tratanod de conectarse al servidor");
-			System.exit(128);
+			System.exit(128); 
 		}
 
 
@@ -150,6 +159,7 @@ public class Player extends JPanel implements ActionListener {
             reconnect();
         }
         try {
+            game.recoverPlayer(playerName);
             player = (I_InfoPlayer) Naming.lookup("rmi://"+currentAddress+":1099/"+playerName);
         } catch (Exception e){
             System.out.println("Exception Player");
