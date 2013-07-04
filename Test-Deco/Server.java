@@ -502,6 +502,8 @@ public class Server{
 	}
     
     public void disconnect(String name, I_InfoPlayer player) {
+        InfoGame tmpGame = game;
+        I_InfoPlayer tmpPlayer = player;
         try {
             Naming.unbind("rmi://"+serverInfo.getIpAddr()+":1099/I_InfoGame");
             Naming.unbind("rmi://"+serverInfo.getIpAddr()+":1099/"+name);
@@ -509,6 +511,9 @@ public class Server{
             System.out.println("Failed unbind");
             System.exit(128);
         }
+        game = null;
+        player = null;
+		System.gc();
         System.out.println("Disconnected");
         ServerTimer timer = new ServerTimer(5);
 		Thread thread = new Thread(timer);
@@ -517,6 +522,8 @@ public class Server{
 		timer.shutDown();
 		timer = null;
 		System.gc();
+        game = tmpGame;
+        player = tmpPlayer;
         try {
             Naming.rebind("rmi://"+serverAddress+":1099/I_InfoGame", game);
             Naming.rebind("rmi://"+serverAddress+":1099/"+name, player);
