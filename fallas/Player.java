@@ -638,6 +638,7 @@ public class Player extends JPanel implements ActionListener {
 		}
 
 		try{
+			System.out.println("qdfqsdf");
 			waitingForNewServer(clientPort);
 
 			game = (I_InfoGame) Naming.lookup("rmi://"+nextAddress+":1099/I_InfoGame");
@@ -653,6 +654,7 @@ public class Player extends JPanel implements ActionListener {
 			System.out.println("URL invalida");
 			System.exit(128);
 		} catch (RemoteException e){
+			e.printStackTrace();
 			System.out.println("Excepcion remota tratanod de conectarse al servidor");
 			System.exit(128);
 		}
