@@ -580,16 +580,13 @@ public class Server{
     private static void recuperacionFallas(){
 	    File file = new File(serverName+".swp");
 	    if (file.exists()){
-            System.out.println("Got the file");
 		    try {
 			    System.out.println("Un fichero de salvaguarda es presente:");
                 System.out.println("Quiere recuperar el antiguo juego(y/n)?");
                 BufferedReader in=new BufferedReader(new InputStreamReader(System.in));
                 while(true) {
-                    System.out.println("Yes");
                     String s = in.readLine();
 				    if(s.equals("y")){
-                        System.out.println("Yes");
                         recuperationServer();
 					    InputStream ips=new FileInputStream(serverName+".swp"); 
 					    InputStreamReader ipsr=new InputStreamReader(ips);
@@ -600,7 +597,6 @@ public class Server{
                         break;
 				    }else if(s.equals("n")){
                         serverInit();
-                        System.out.println("No");
 					    break;
 				    }
                 }

@@ -126,10 +126,7 @@ public class Player extends JPanel implements ActionListener {
 		timer = new Timer(40, this);
 		timer.start();
 
-		if (clientStatus == 1) {
-			System.out.println("Old PLayer");
-			repaint();
-		}
+		if (clientStatus == 1) repaint();
 	}
 
 

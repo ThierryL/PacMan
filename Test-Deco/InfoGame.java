@@ -267,7 +267,6 @@ public class InfoGame  extends UnicastRemoteObject implements I_InfoGame{
 
 		I_InfoPlayer player = findPlayer(name);
 		if(player == null) {
-			System.out.println("NewPlayer");
 			player = new InfoPlayer(name);
 			try {
 				Naming.rebind("rmi://"+serverAddress+":1099/"+name, player);
@@ -282,7 +281,6 @@ public class InfoGame  extends UnicastRemoteObject implements I_InfoGame{
 			return 0;
 		}
 		else {
-			System.out.println("Old One");
 			recoverPlayer(name);
 			return 1;
 		}
@@ -315,23 +313,6 @@ public class InfoGame  extends UnicastRemoteObject implements I_InfoGame{
 	public  ArrayList<I_InfoPlayer> getPlayers() throws RemoteException {
 		return this.players;
 	}
-
-	//	public void setCurrentSpeed(int currentSpeed) throws RemoteException {
-	//		this.currentSpeed = currentSpeed;
-	//	}
-	//
-	//	public int getCurrentSpeed() throws RemoteException {
-	//		return this.currentSpeed;
-	//	}
-	//
-	//	public int getMaxSpeed() throws RemoteException {
-	//		return this.maxSpeed;
-	//	}
-	//
-	//	public int[] getValidSpeeds() throws RemoteException {
-	//		return this.validSpeeds;
-	//	}
-
 
 	public void setNbPlayerExpected(int n){
 		nbPlayerExpected = n;
@@ -521,23 +502,6 @@ public class InfoGame  extends UnicastRemoteObject implements I_InfoGame{
 
 	public void finished() {
 		server.finished();
-		try{
-			//	I_InfoPlayer tmp = players.get(0);
-			//	for (int i = 0; i<players.size(); i++)
-			//		if (tmp.getScore() < players.get(i).getScore()) {
-			//			tmp = players.get(i);
-			//		}
-			//	for (int i = 0; i<players.size(); i++) {
-			//		if (!tmp.getName().equals(players.get(i).getName())){
-			//			players.get(i).isLooser();
-			//	}
-			//		else players.get(i).isWinner();
-			//	}
-			//playerWaiting = 0;
-			//playerInGame = 0;
-		} catch (Exception exc) {
-			exc.printStackTrace();
-		}
 	}
 
 	public void exit(String name) {
