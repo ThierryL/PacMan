@@ -13,6 +13,7 @@ public class Server{
 	private static InfoGame game;
 	private static String ipAddress;
 	private static String serverAddress = "";
+	private static String serverName;
 	private static Node serverInfo;
 	private static ListAddr listAddr;
 	private static ServerChat discussion;
@@ -261,6 +262,7 @@ public class Server{
 
 
 	public void moveGhosts() {
+		saveStateServer();//We save the configuration of the game
 		try {
 			int nbrPlayerInGame = game.getNbrPlayerInGame();
 			int[] ghosty = game.getGhosty();
@@ -503,30 +505,48 @@ public class Server{
     
     public void disconnect(String name, I_InfoPlayer player) {
         try {
-            Naming.unbind("rmi://"+serverInfo.getIpAddr()+":1099/I_InfoGame");
-            Naming.unbind("rmi://"+serverInfo.getIpAddr()+":1099/"+name);
-        } catch (Exception e){
-            System.out.println("Failed unbind");
-            System.exit(128);
-        }
-        System.out.println("Disconnected");
-        ServerTimer timer = new ServerTimer(5);
-		Thread thread = new Thread(timer);
-		thread.start();
-		while(!timer.finished());
-		timer.shutDown();
-		timer = null;
-		System.gc();
-        try {
-            Naming.rebind("rmi://"+serverAddress+":1099/I_InfoGame", game);
-            Naming.rebind("rmi://"+serverAddress+":1099/"+name, player);
-        } catch (Exception e){
-            System.out.println("Failed rebind");
-            System.exit(128);
-        }
-        System.out.println("Reconnected");
+		Naming.unbind("rmi://"+serverInfo.getIpAddr()+":1099/I_InfoGame");
+		Naming.unbind("rmi://"+serverInfo.getIpAddr()+":1099/"+name);
+	} catch (Exception e){
+		System.out.println("Failed unbind");
+		System.exit(128);
+	}
+	System.out.println("Disconnected");
+	ServerTimer timer = new ServerTimer(5);
+	Thread thread = new Thread(timer);
+	thread.start();
+	while(!timer.finished());
+	timer.shutDown();
+	timer = null;
+	System.gc();
+	try {
+		Naming.rebind("rmi://"+serverAddress+":1099/I_InfoGame", game);
+		Naming.rebind("rmi://"+serverAddress+":1099/"+name, player);
+	} catch (Exception e){
+		System.out.println("Failed rebind");
+		System.exit(128);
+	}
+	System.out.println("Reconnected");
     }
 
+    public static void saveStateServer(){
+	    String nomFic = serverName+".swp";
+
+	    try
+	    {
+		    FileWriter fw = new FileWriter(nomFic, false);
+		    BufferedWriter output = new BufferedWriter(fw);
+
+		    output.write(infoComplete());
+		    output.flush();
+		    output.close();
+	    }
+	    catch(IOException ioe){
+		    System.out.print("Erreur : ");
+		    ioe.printStackTrace();
+	    }
+
+    }
 
 	public static void main(String[] args){
 		// Establecimiento del game en el rmiserver
@@ -537,6 +557,7 @@ public class Server{
 
 		listAddr = new ListAddr();
 		serverInfo = listAddr.getServer(args[args.length-1]);
+		serverName=args[args.length-1];
 		
 		
 		if (args.length == 2 && args[0].equals("wait")){
@@ -549,8 +570,24 @@ public class Server{
 		}
 		else {
 			if (args.length == 2) numPlayer = Integer.parseInt(args[0]);
-			//System.out.println("Initialisation");
 			serverInit();
+
+			File file = new File(serverName+".swp");
+			if (file.exists()){
+				try {
+					InputStream ips=new FileInputStream(serverName+".swp"); 
+					InputStreamReader ipsr=new InputStreamReader(ips);
+					BufferedReader br=new BufferedReader(ipsr);
+					String info=br.readLine();
+					reconstruction(info);
+				}catch (FileNotFoundException e) {
+					System.out.println("Failed to wait");
+				}catch (IOException e) {
+					System.out.println("Failed to wait");
+				}
+
+			}
+			saveStateServer();
 			serverRunning();
 		}
 
