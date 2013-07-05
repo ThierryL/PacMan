@@ -697,19 +697,12 @@ public class Player extends JPanel implements ActionListener {
 			if (player.getDying()) {
 				Death();
 			} else {
-                System.out.println("On entre dans le try");
 				MovePacMan();
-                System.out.println("On bouge");
 				DrawPacMan();
-                System.out.println("On dessine");
 				game.moveGhosts();
-                System.out.println("On bouge les fantomes");
 				CheckPlayerKilled();
-                System.out.println("On check");
 				drawGhost();
-                System.out.println("On dessine les fantomes");
 				CheckMaze();
-                System.out.println("On check");
 			}
 
 			game.saveConf(playerName);
@@ -739,7 +732,6 @@ public class Player extends JPanel implements ActionListener {
 			if (finished) {
 				player.setScore(player.getScore()+50);
 
-				//game.finished();
 				game.levelContinue();
 				game.setEnded(true);
 				game.setPlaying(false);
