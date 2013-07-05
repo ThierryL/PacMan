@@ -238,20 +238,47 @@ public class InfoGame  extends UnicastRemoteObject implements I_InfoGame{
 	public String getNextAddress() throws RemoteException{
 		return newAddress;
 	}
+    
+    public void recoverPlayer(String name) throws RemoteException {
+        if (findPlayer(name) != null) {
+            try {
+                Naming.unbind("rmi://localhost:1099/"+name);
+                I_InfoPlayer player = null;
+                for (int i = 0; i<players.size(); i++){
+                    if(saveStatePlayers.get(i).getName().equals(name)) {
+                        players.set(i, saveStatePlayers.get(i));
+                        player = players.get(i);
+                        break;
+                    }
+                }
+                Naming.rebind("rmi://"+serverAddress+":1099/"+name, player);
+            }  catch (Exception e) {
+                System.out.println("Failed To unbind/rebind object with the RMI registry");
+            }
+        }
+        else {
+            System.out.println("Failed Recovery");
+            newPlayer(name);
+        }
+    }
 
     public void newPlayer(String name) throws RemoteException{
 
 	try {
 
-		I_InfoPlayer player;
-		//I_InfoPlayer player = findPlayer(name);
-		//if (player==null){
-			player = new InfoPlayer(name);
+		I_InfoPlayer player = findPlayer(name);
+        if(player == null) {
+            System.out.println("NewPlayer");
+            player = new InfoPlayer(name);
 			Naming.rebind("rmi://"+serverAddress+":1099/"+name, player);
 			players.add(player);
 			saveStatePlayers.add(player);
 			nbPlayer += 1;
-		//}
+		}
+        else {
+            System.out.println("Old One");
+            recoverPlayer(name);
+        }
 	} catch (RemoteException e){
 		System.out.println("Hubo una excepcion creando la instancia del objeto distribuido");
 	} catch (MalformedURLException e){
@@ -549,7 +576,7 @@ public class InfoGame  extends UnicastRemoteObject implements I_InfoGame{
 			exc.printStackTrace();
 		}
 
-		try {  
+		try {
 			Naming.unbind("rmi://localhost:1099/"+name);  
 		}  catch (Exception e) {  
 			System.out.println("Failed To unbind object with the RMI registry");  
@@ -580,7 +607,7 @@ public class InfoGame  extends UnicastRemoteObject implements I_InfoGame{
 	public int getClientPort() throws RemoteException{
 		return server.getClientPort();
 	}
-
+    
 	public void saveConf(String name) throws RemoteException{
 		    for (int i = 0; i<players.size(); i++){
 			    if(players.get(i).getName().equals(name)) {
@@ -588,7 +615,6 @@ public class InfoGame  extends UnicastRemoteObject implements I_InfoGame{
 				    break;
 			    }
 		    }
-
 	}
 
 }

@@ -88,6 +88,7 @@ public class Player extends JPanel implements ActionListener {
         
 		if (namePlayer.equals("")){
 			playerName = "Player" + (int)(Math.random()*1000);
+            System.out.println(playerName);
 		}else{
 			playerName=namePlayer;
 		}
@@ -158,6 +159,7 @@ public class Player extends JPanel implements ActionListener {
             reconnect();
         }
         try {
+            game.recoverPlayer(playerName);
             player = (I_InfoPlayer) Naming.lookup("rmi://"+currentAddress+":1099/"+playerName);
         } catch (Exception e){
             System.out.println("Exception Player");
