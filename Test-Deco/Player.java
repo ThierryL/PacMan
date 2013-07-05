@@ -53,12 +53,12 @@ public class Player extends JPanel implements ActionListener {
 	private static String currentAddress;
 	private static String nextAddress = "";
 	private static int portInUse;
-    int response = 0;
+	private int clientStatus = 0;
 
 	boolean win = false;
 	boolean end = false;
 	boolean waiting = false;
-	
+
 
 
 	Image ghost;
@@ -73,8 +73,8 @@ public class Player extends JPanel implements ActionListener {
 	public Player(String addr, String namePlayer) {
 
 		currentAddress = addr;
-        
-        try{
+
+		try{
 			game = (I_InfoGame) Naming.lookup("rmi://"+currentAddress+":1099/I_InfoGame");
 		} catch (NotBoundException e){
 			System.out.println("El servicio no esta publicado en el servidor");
@@ -86,16 +86,16 @@ public class Player extends JPanel implements ActionListener {
 			System.out.println("Excepcion remota tratanod de conectarse al servidor");
 			System.exit(128);
 		}
-        
+
 		playerName = namePlayer;
 
 		try {
-			response = game.newPlayer(playerName);
-        } catch (RemoteException re){
-            reconnect();
+			clientStatus = game.newPlayer(playerName);
+		} catch (RemoteException re){
+			reconnect();
 		} catch (Exception e) {
 			System.out.println("Exception Récupération");
-            e.printStackTrace();
+			e.printStackTrace();
 		}
 
 
@@ -111,65 +111,64 @@ public class Player extends JPanel implements ActionListener {
 			System.out.println("Excepcion remota tratanod de conectarse al servidor");
 			System.exit(128); 
 		}
-        
-        GetImages();
-        
-        addKeyListener(new TAdapter());
-        mazecolor = new Color(5, 100, 5);
-        setFocusable(true);
-        
-        d = new Dimension(400, 400);
-        
-        setBackground(Color.black);
-        setDoubleBuffered(true);
-        timer = new Timer(40, this);
-        timer.start();
 
-        if (response == 1) {
-            System.out.println("Old PLayer");
-            PlayGame();
-        }
-    }
+		GetImages();
+
+		addKeyListener(new TAdapter());
+		mazecolor = new Color(5, 100, 5);
+		setFocusable(true);
+
+		d = new Dimension(400, 400);
+
+		setBackground(Color.black);
+		setDoubleBuffered(true);
+		timer = new Timer(40, this);
+		timer.start();
+
+		if (clientStatus == 1) {
+			System.out.println("Old PLayer");
+			repaint();
+		}
+	}
 
 
 	public void addNotify() {
-        if (response == 1) return;
 		super.addNotify();
 		try {
-			player.playerInit();
+            if (clientStatus != 1) player.playerInit();
 			if (!game.isPlaying()){
 				game.GameInit();
 			}
 
 		} catch (RemoteException re){
-            reconnect();
+			reconnect();
 		} catch (Exception e) {
 			System.out.println("Exception addNotify");
-            e.printStackTrace();
+			e.printStackTrace();
 		}
 
 	}
 
-    
-    private void reconnect() {
-	    game = null;
-	    player = null;
-	    ShowDecoScreen();
-	    try {
-		    game = (I_InfoGame) Naming.lookup("rmi://"+currentAddress+":1099/I_InfoGame");
-	    } catch (Exception e){
-		    System.out.println("Exception Game");
-		    reconnect();
-	    }
-	    try {
-		    //game.recoverPlayer(playerName);
-		    player = (I_InfoPlayer) Naming.lookup("rmi://"+currentAddress+":1099/"+playerName);
-	    } catch (Exception e){
-		    System.out.println("Exception Player");
-		    reconnect();
-	    }
-	    PlayGame();
-    }
+
+	private void reconnect() {
+		game = null;
+		player = null;
+		ShowDecoScreen();
+		try {
+			game = (I_InfoGame) Naming.lookup("rmi://"+currentAddress+":1099/I_InfoGame");
+		} catch (Exception e){
+			System.out.println("Exception Game");
+			reconnect();
+		}
+		try {
+			//game.recoverPlayer(playerName);
+			player = (I_InfoPlayer) Naming.lookup("rmi://"+currentAddress+":1099/"+playerName);
+		} catch (Exception e){
+			System.out.println("Exception Player");
+			reconnect();
+		}
+		repaint();
+	}
 
 
 	public void DoAnim() {
@@ -229,10 +228,10 @@ public class Player extends JPanel implements ActionListener {
 			g2d.drawString(s, (scrsize - metr.stringWidth(s)) / 2, scrsize / 2 -10);
 			g2d.drawString(s1, (scrsize - metr.stringWidth(s)) / 2, scrsize / 2 +10);
 		} catch (RemoteException re){
-            reconnect();
+			reconnect();
 		} catch (Exception e) {
 			System.out.println("Exception Pause Screen");
-            e.printStackTrace();
+			e.printStackTrace();
 		}
 	}
 	public void ShowEndScreen() {
@@ -252,10 +251,10 @@ public class Player extends JPanel implements ActionListener {
 			g2d.setFont(small);
 			g2d.drawString(s, (scrsize - metr.stringWidth(s)) / 2, scrsize / 2);
 		} catch (RemoteException re){
-            reconnect();
+			reconnect();
 		} catch (Exception e) {
 			System.out.println("Exception End Screen");
-            e.printStackTrace();
+			e.printStackTrace();
 		}
 	}
 
@@ -276,10 +275,10 @@ public class Player extends JPanel implements ActionListener {
 			g2d.setFont(small);
 			g2d.drawString(s, (scrsize - metr.stringWidth(s)) / 2, scrsize / 2);
 		} catch (RemoteException re){
-            reconnect();
+			reconnect();
 		} catch (Exception e) {
 			System.out.println("Exception Dead Screen");
-            e.printStackTrace();
+			e.printStackTrace();
 		}
 	}
 
@@ -291,7 +290,7 @@ public class Player extends JPanel implements ActionListener {
 			g2d.fillRect(50, scrsize / 2 - 30, scrsize - 100, 50);
 			g2d.setColor(Color.white);
 			g2d.drawRect(50, scrsize / 2 - 30, scrsize - 100, 50);
-			
+
 			String s = "Press s to start.";
 			Font small = new Font("Helvetica", Font.BOLD, 14);
 			FontMetrics metr = this.getFontMetrics(small);
@@ -300,10 +299,10 @@ public class Player extends JPanel implements ActionListener {
 			g2d.setFont(small);
 			g2d.drawString(s, (scrsize - metr.stringWidth(s)) / 2, scrsize / 2);
 		} catch (RemoteException re){
-            reconnect();
+			reconnect();
 		} catch (Exception e) {
 			System.out.println("Exception Intro Screen");
-            e.printStackTrace();
+			e.printStackTrace();
 		}
 	}
 
@@ -311,13 +310,13 @@ public class Player extends JPanel implements ActionListener {
 		try{
 			int scrsize = game.getScrsize();
 			int n = game.getNbPlayerExpected() - game.getNbPlayerWaiting();
-			
+
 
 			g2d.setColor(new Color(0, 32, 48));
 			g2d.fillRect(50, scrsize / 2 - 30, scrsize - 100, 50);
 			g2d.setColor(Color.white);
 			g2d.drawRect(50, scrsize / 2 - 30, scrsize - 100, 50);
-			
+
 			String s = "Waiting for " + n + " others players";
 			Font small = new Font("Helvetica", Font.BOLD, 14);
 			FontMetrics metr = this.getFontMetrics(small);
@@ -326,10 +325,10 @@ public class Player extends JPanel implements ActionListener {
 			g2d.setFont(small);
 			g2d.drawString(s, (scrsize - metr.stringWidth(s)) / 2, scrsize / 2);
 		} catch (RemoteException re){
-            reconnect();
+			reconnect();
 		} catch (Exception e) {
 			System.out.println("Exception Waiting Screen");
-            e.printStackTrace();
+			e.printStackTrace();
 		}
 	}
 
@@ -347,8 +346,8 @@ public class Player extends JPanel implements ActionListener {
 			g2d.setFont(smallfont);
 			g2d.setColor(new Color(96, 128, 255));
 			if(end) {
-				 if(win) s = "You won ! Score: "+score;
-				 else s = "You lost ! Score: "+score;
+				if(win) s = "You won ! Score: "+score;
+				else s = "You lost ! Score: "+score;
 			}
 			else s = "Score: " + score;
 			g2d.drawString(s, scrsize / 2 - 14, scrsize + 16);
@@ -357,10 +356,10 @@ public class Player extends JPanel implements ActionListener {
 			}
 
 		} catch (RemoteException re){
-            reconnect();
+			reconnect();
 		} catch (Exception e) {
 			System.out.println("Exception Draw Score");
-            e.printStackTrace();
+			e.printStackTrace();
 		}
 	}
 
@@ -377,16 +376,16 @@ public class Player extends JPanel implements ActionListener {
 			}
 
 		} catch (RemoteException re){
-            reconnect();
+			reconnect();
 		} catch (Exception e) {
 			System.out.println("Exception Draw Ghost");
-            e.printStackTrace();
+			e.printStackTrace();
 		}
 	}
 
 	public void DrawPacMan() {
 		try{
-		ArrayList<I_InfoPlayer> players = game.getPlayers();
+			ArrayList<I_InfoPlayer> players = game.getPlayers();
 			for(int i = 0; i<players.size(); i++) {
 				if (players.get(i).isPlaying()) {
 					if (players.get(i).getViewdx() == -1)
@@ -401,10 +400,10 @@ public class Player extends JPanel implements ActionListener {
 			}
 
 		} catch (RemoteException re){
-            reconnect();
+			reconnect();
 		} catch (Exception e) {
 			System.out.println("Exception Draw PacMan");
-            e.printStackTrace();
+			e.printStackTrace();
 		}
 
 	}
@@ -427,10 +426,10 @@ public class Player extends JPanel implements ActionListener {
 			}
 
 		} catch (RemoteException re){
-            reconnect();
+			reconnect();
 		} catch (Exception e) {
 			System.out.println("Exception Draw PacMan Up");
-            e.printStackTrace();
+			e.printStackTrace();
 		}
 
 	}
@@ -454,10 +453,10 @@ public class Player extends JPanel implements ActionListener {
 			}
 
 		} catch (RemoteException re){
-            reconnect();
+			reconnect();
 		} catch (Exception e) {
 			System.out.println("Exception Draw PacMan Down");
-            e.printStackTrace();
+			e.printStackTrace();
 		}
 
 	}
@@ -481,10 +480,10 @@ public class Player extends JPanel implements ActionListener {
 			}
 
 		} catch (RemoteException re){
-            reconnect();
+			reconnect();
 		} catch (Exception e) {
 			System.out.println("Exception Draw PacMan Left");
-            e.printStackTrace();
+			e.printStackTrace();
 		}
 
 	}
@@ -508,10 +507,10 @@ public class Player extends JPanel implements ActionListener {
 			}
 
 		} catch (RemoteException re){
-            reconnect();
+			reconnect();
 		} catch (Exception e) {
 			System.out.println("Exception Draw PacMan Right");
-            e.printStackTrace();
+			e.printStackTrace();
 		}
 
 	}
@@ -558,12 +557,12 @@ public class Player extends JPanel implements ActionListener {
 					i++;
 				}
 			}
-        } catch (RemoteException re){
-            reconnect();
-        } catch (Exception e) {
-            System.out.println("Exception Draw Maze");
-            e.printStackTrace();
-        }
+		} catch (RemoteException re){
+			reconnect();
+		} catch (Exception e) {
+			System.out.println("Exception Draw Maze");
+			e.printStackTrace();
+		}
 	}
 
 
@@ -595,7 +594,6 @@ public class Player extends JPanel implements ActionListener {
 
 		g2d.setColor(Color.black);
 		g2d.fillRect(0, 0, d.width, d.height);
-
 		DrawMaze();
 		DrawScore();
 		DoAnim();
@@ -622,14 +620,11 @@ public class Player extends JPanel implements ActionListener {
 			}
 
 		} catch (RemoteException re){
-            reconnect();
+			reconnect();
 		} catch (Exception e) {
 			System.out.println("Exception Paint");
-            e.printStackTrace();
+			e.printStackTrace();
 		}
-
-
-
 
 		g.drawImage(ii, 5, 5, this);
 		Toolkit.getDefaultToolkit().sync();
@@ -641,15 +636,15 @@ public class Player extends JPanel implements ActionListener {
 		Socket clientSocket = null;
 		InetAddress inetAddress = null;
 		DataOutputStream out = null;
-  		BufferedReader in = null;
+		BufferedReader in = null;
 		try {
 			inetAddress = InetAddress.getByName(currentAddress);
-  			clientSocket = new Socket(inetAddress, port);
-  			out = new DataOutputStream(clientSocket.getOutputStream());
-  			in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+			clientSocket = new Socket(inetAddress, port);
+			out = new DataOutputStream(clientSocket.getOutputStream());
+			in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 			while(!info.equals("moved"))  info = in.readLine();
 			out.writeBytes("");
-  			clientSocket.close();
+			clientSocket.close();
 		} catch (Exception e){
 			//reconnect();
 			System.out.println("Failed socket to server");
@@ -658,7 +653,7 @@ public class Player extends JPanel implements ActionListener {
 	}
 
 	private void changeServer() {
-			int clientPort = 0; 
+		int clientPort = 0; 
 		try{
 			clientPort = game.getClientPort();
 			nextAddress = game.getNextAddress();
@@ -671,7 +666,7 @@ public class Player extends JPanel implements ActionListener {
 			player = null;
 			game.unbinding(playerName);
 			game = null;
-			  
+
 		}  catch (Exception e) {  
 			System.out.println("Failed To unbind object with the RMI registry");  
 		}
@@ -684,7 +679,7 @@ public class Player extends JPanel implements ActionListener {
 			currentAddress = nextAddress;
 			game.playerConnected();
 			while(game.moving());
-			
+
 		} catch (NotBoundException e){
 			System.out.println("El servicio no esta publicado en el servidor");
 			System.exit(128);
@@ -702,21 +697,28 @@ public class Player extends JPanel implements ActionListener {
 			if (player.getDying()) {
 				Death();
 			} else {
+                System.out.println("On entre dans le try");
 				MovePacMan();
+                System.out.println("On bouge");
 				DrawPacMan();
+                System.out.println("On dessine");
 				game.moveGhosts();
+                System.out.println("On bouge les fantomes");
 				CheckPlayerKilled();
+                System.out.println("On check");
 				drawGhost();
+                System.out.println("On dessine les fantomes");
 				CheckMaze();
+                System.out.println("On check");
 			}
 
 			game.saveConf(playerName);
 
 		} catch (RemoteException re){
-            reconnect();
+			reconnect();
 		} catch (Exception e) {
 			System.out.println("Exception PlayGame");
-            e.printStackTrace();
+			e.printStackTrace();
 		}
 
 	}
@@ -743,15 +745,15 @@ public class Player extends JPanel implements ActionListener {
 				game.setPlaying(false);
 
 
-				
+
 			}
-            } catch (RemoteException re){
-                reconnect();
-            } catch (Exception e) {
-                System.out.println("Exception Check Maze");
-                e.printStackTrace();
-            }
-    }
+		} catch (RemoteException re){
+			reconnect();
+		} catch (Exception e) {
+			System.out.println("Exception Check Maze");
+			e.printStackTrace();
+		}
+	}
 
 	public void CheckPlayerKilled() {
 		short i;
@@ -768,19 +770,19 @@ public class Player extends JPanel implements ActionListener {
 						player.getPacmany() > (ghosty[i] - 12) && player.getPacmany() < (ghosty[i] + 12) &&
 						player.isPlaying()) {
 
-						player.setDying(true);
-						game.setDeathcounter(game.getDeathcounter() +64);
+					player.setDying(true);
+					game.setDeathcounter(game.getDeathcounter() +64);
 
-							}
 				}
-                } catch (RemoteException re){
-                    reconnect();
-                } catch (Exception e) {
-                    System.out.println("Exception Check Player Killed");
-                    e.printStackTrace();
-                }
-
+			}
+		} catch (RemoteException re){
+			reconnect();
+		} catch (Exception e) {
+			System.out.println("Exception Check Player Killed");
+			e.printStackTrace();
 		}
+
+	}
 
 	public void MovePacMan() {
 		int pos;
@@ -834,16 +836,16 @@ public class Player extends JPanel implements ActionListener {
 			player.setPacmanx(player.getPacmanx() + player.getPacmanspeed() * player.getPacmandx());
 			player.setPacmany(player.getPacmany() + player.getPacmanspeed() * player.getPacmandy());
 		} catch (RemoteException re){
-            reconnect();
+			reconnect();
 		} catch (Exception e) {
 			System.out.println("Exception Move PacMan");
-            e.printStackTrace();
+			e.printStackTrace();
 		}
 	}
 
 	public void Death() {
 		try {
-			
+
 			player.setPacsleft(player.getPacsleft()-1);
 			if (player.getPacsleft() == 0){
 				player.setPlaying(false);
@@ -861,42 +863,42 @@ public class Player extends JPanel implements ActionListener {
 				game.setPlaying(false);
 			}
 		} catch (RemoteException re){
-            reconnect();
+			reconnect();
 		}catch (Exception e) {
 			System.out.println("Exception Death");
-            e.printStackTrace();
+			e.printStackTrace();
 		}
 	}
 
 	public void exit() {
 		try{
-		game.exit(player.getName());
+			game.exit(player.getName());
 		} catch (RemoteException re){
-            reconnect();
+			reconnect();
 		} catch (Exception e) {
 			System.out.println("Exception Exit");
-            e.printStackTrace();
+			e.printStackTrace();
 		}
 	}
 
 	public void win() {
-	//	win = true;
-	//	end = true;
-	//	try {
-	//	player.setIngame(false);
-	//	} catch (Exception e) {
-	//		reconnect();
-	//	}
+		//	win = true;
+		//	end = true;
+		//	try {
+		//	player.setIngame(false);
+		//	} catch (Exception e) {
+		//		reconnect();
+		//	}
 	}
 
 	public void loose() {
-	//	win = false;
-	//	end = true;
-	//	try {
-	//	player.setIngame(false);
-	//	} catch (Exception e) {
-	//		e.printStackTrace();
-	//	}
+		//	win = false;
+		//	end = true;
+		//	try {
+		//	player.setIngame(false);
+		//	} catch (Exception e) {
+		//		e.printStackTrace();
+		//	}
 	}
 
 	class TAdapter extends KeyAdapter {
@@ -908,13 +910,13 @@ public class Player extends JPanel implements ActionListener {
 			try {
 				if (player.isPlaying())
 				{
-                    if (key == 'u' || key == 'U')
+					if (key == 'u' || key == 'U')
 					{
 						game.disconnect(playerName);
-                        game = null;
-                        player = null;
+						game = null;
+						player = null;
 					}
-                    
+
 					if (key == KeyEvent.VK_LEFT)
 					{
 						reqdx=-1;
@@ -981,11 +983,11 @@ public class Player extends JPanel implements ActionListener {
 				}
 
 			} catch (RemoteException re){
-                reconnect();
-            } catch (Exception ex) {
-                System.out.println("Exception Key Pressed");
-                ex.printStackTrace();
-		}
+				reconnect();
+			} catch (Exception ex) {
+				System.out.println("Exception Key Pressed");
+				ex.printStackTrace();
+			}
 
 		}
 
@@ -1000,11 +1002,11 @@ public class Player extends JPanel implements ActionListener {
 					player.setReqdy(0);
 
 				} catch (RemoteException re){
-                    reconnect();
-                } catch (Exception ex) {
-                    System.out.println("Exception Key Released");
-                    ex.printStackTrace();
-            }
+					reconnect();
+				} catch (Exception ex) {
+					System.out.println("Exception Key Released");
+					ex.printStackTrace();
+				}
 
 			}
 		}

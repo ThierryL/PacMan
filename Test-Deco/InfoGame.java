@@ -611,6 +611,7 @@ public class InfoGame  extends UnicastRemoteObject implements I_InfoGame{
 	public void saveConf(String name) throws RemoteException{
 		for (int i = 0; i<players.size(); i++){
 			if(players.get(i).getName().equals(name)) {
+                System.out.println(i);
 				saveStatePlayers.set(i, players.get(i));
 				break;
 			}
