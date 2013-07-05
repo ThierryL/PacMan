@@ -6,7 +6,7 @@ import java.util.ArrayList;
 public class InfoPlayer extends UnicastRemoteObject implements I_InfoPlayer{
 
 
-	
+
 	private static final long serialVersionUID = 1L;
 	private final int pacmanspeed = 6;
 	private int pacsleft, score;
