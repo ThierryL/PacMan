@@ -239,6 +239,29 @@ public class InfoGame  extends UnicastRemoteObject implements I_InfoGame{
 		return newAddress;
 	}
 
+    public void recoverPlayer(String name) throws RemoteException {
+        if (findPlayer(name) != null) {
+            try {
+                Naming.unbind("rmi://localhost:1099/"+name);
+                I_InfoPlayer player = null;
+                for (int i = 0; i<players.size(); i++){
+                    if(saveStatePlayers.get(i).getName().equals(name)) {
+                        players.set(i, saveStatePlayers.get(i));
+                        player = players.get(i);
+                        break;
+                    }
+                }
+                Naming.rebind("rmi://"+serverAddress+":1099/"+name, player);
+            }  catch (Exception e) {
+                System.out.println("Failed To unbind/rebind object with the RMI registry");
+            }
+        }
+        else {
+            System.out.println("Failed Recovery");
+            newPlayer(name);
+        }
+    }
+
     public void newPlayer(String name) throws RemoteException{
 
 	try {

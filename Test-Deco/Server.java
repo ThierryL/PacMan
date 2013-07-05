@@ -13,6 +13,7 @@ public class Server{
 	private static InfoGame game;
 	private static String ipAddress;
 	private static String serverAddress = "";
+	private static String serverName;
 	private static Node serverInfo;
 	private static ListAddr listAddr;
 	private static ServerChat discussion;
@@ -261,6 +262,7 @@ public class Server{
 
 
 	public void moveGhosts() {
+		saveStateServer();//We save the configuration of the game
 		try {
 			int nbrPlayerInGame = game.getNbrPlayerInGame();
 			int[] ghosty = game.getGhosty();
@@ -534,6 +536,55 @@ public class Server{
         System.out.println("Reconnected");
     }
 
+    public static void saveStateServer(){
+	    String nomFic = serverName+".swp";
+
+	    try
+	    {
+		    FileWriter fw = new FileWriter(nomFic, false);
+		    BufferedWriter output = new BufferedWriter(fw);
+
+		    output.write(infoComplete());
+		    output.flush();
+		    output.close();
+	    }
+	    catch(IOException ioe){
+		    System.out.print("Erreur : ");
+		    ioe.printStackTrace();
+	    }
+
+    }
+    private static void recuperacionFallas(){
+	    File file = new File(serverName+".swp");
+	    if (file.exists()){
+		    try {
+			    System.out.println("Un fichero de salvaguarda es presente:");
+			    boolean b=true;
+			    while(b){
+				    System.out.println("Quiere recuperar el antiguo juego(y/n)?");
+				    BufferedReader in=new BufferedReader(new InputStreamReader(System.in));
+				    String s=in.readLine();
+				    if(s.equals("y")){
+					    InputStream ips=new FileInputStream(serverName+".swp"); 
+					    InputStreamReader ipsr=new InputStreamReader(ips);
+					    BufferedReader br=new BufferedReader(ipsr);
+					    String info=br.readLine();
+					    reconstruction(info);
+
+					    b=false;
+				    }else if(s.equals("n")){ 
+					    b=false;
+				    }
+			    }
+		    }catch (FileNotFoundException e) {
+			    System.out.println("Failed to wait");
+		    }catch (IOException e) {
+			    System.out.println("Failed to wait");
+		    }
+
+	    }
+	    saveStateServer();
+    }
 
 	public static void main(String[] args){
 		// Establecimiento del game en el rmiserver
@@ -544,6 +595,7 @@ public class Server{
 
 		listAddr = new ListAddr();
 		serverInfo = listAddr.getServer(args[args.length-1]);
+		serverName=args[args.length-1];
 		
 		
 		if (args.length == 2 && args[0].equals("wait")){
@@ -558,6 +610,7 @@ public class Server{
 			if (args.length == 2) numPlayer = Integer.parseInt(args[0]);
 			//System.out.println("Initialisation");
 			serverInit();
+			recuperacionFallas();
 			serverRunning();
 		}
 
