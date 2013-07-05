@@ -154,6 +154,7 @@ public class Player extends JPanel implements ActionListener {
     private void reconnect() {
 	    game = null;
 	    player = null;
+	    ShowDecoScreen();
 	    try {
 		    game = (I_InfoGame) Naming.lookup("rmi://"+currentAddress+":1099/I_InfoGame");
 	    } catch (Exception e){
@@ -183,26 +184,20 @@ public class Player extends JPanel implements ActionListener {
 
 
 	public void ShowDecoScreen() {
-		try{
-			int scrsize = game.getScrsize();
+			int scrsize = 20*20;
 
 			g2d.setColor(new Color(0, 32, 48));
 			g2d.fillRect(50, scrsize / 2 - 30, scrsize - 100, 50);
 			g2d.setColor(Color.white);
 			g2d.drawRect(50, scrsize / 2 - 30, scrsize - 100, 50);
 
-			String s = "Press s to start again, q to quit";
+			String s = "Deconnection, please wait.";
 			Font small = new Font("Helvetica", Font.BOLD, 14);
 			FontMetrics metr = this.getFontMetrics(small);
 
 			g2d.setColor(Color.white);
 			g2d.setFont(small);
 			g2d.drawString(s, (scrsize - metr.stringWidth(s)) / 2, scrsize / 2);
-		} catch (RemoteException re){
-            reconnect();
-		} catch (Exception e) {
-			System.out.println("Exception");
-		}
 	}
 
 	public void ShowPauseScreen() {
