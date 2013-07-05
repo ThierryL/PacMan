@@ -608,7 +608,6 @@ public class Server{
 		}
 		else {
 			if (args.length == 2) numPlayer = Integer.parseInt(args[0]);
-			//System.out.println("Initialisation");
 			serverInit();
 			recuperacionFallas();
 			serverRunning();
