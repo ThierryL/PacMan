@@ -177,7 +177,7 @@ public class Player extends JPanel implements ActionListener {
 
     
     private void reconnect() {
-        System.out.println("Trying to reconnect");
+	    ShowDecoScreen();
         game = null;
         player = null;
         try {
@@ -186,7 +186,6 @@ public class Player extends JPanel implements ActionListener {
         } catch (Exception e){
             reconnect();
         }
-        System.out.println("We have something !");
         PlayGame();
     }
 
@@ -202,6 +201,32 @@ public class Player extends JPanel implements ActionListener {
 	}
 
 
+	public void ShowDecoScreen() {
+		try{
+
+			int scrsize = 48;
+
+			g2d.setColor(new Color(0, 32, 48));
+			g2d.fillRect(50, scrsize / 2 - 30, scrsize - 100, 50);
+			g2d.setColor(Color.white);
+			g2d.drawRect(50, scrsize / 2 - 30, scrsize - 100, 50);
+
+			String s;
+			String s1;
+			s ="              Pause        ";
+			s1="Press space to relaunch";
+
+			Font small = new Font("Helvetica", Font.BOLD, 14);
+			FontMetrics metr = this.getFontMetrics(small);
+
+			g2d.setColor(Color.white);
+			g2d.setFont(small);
+			g2d.drawString(s, (scrsize - metr.stringWidth(s)) / 2, scrsize / 2 -10);
+			g2d.drawString(s1, (scrsize - metr.stringWidth(s)) / 2, scrsize / 2 +10);
+		} catch (Exception e) {
+			reconnect();
+		}
+	}
 
 	public void ShowPauseScreen() {
 		try{
@@ -638,6 +663,7 @@ public class Player extends JPanel implements ActionListener {
 		}
 
 		try{
+			System.out.println("qdfqsdf");
 			waitingForNewServer(clientPort);
 
 			game = (I_InfoGame) Naming.lookup("rmi://"+nextAddress+":1099/I_InfoGame");
@@ -653,6 +679,7 @@ public class Player extends JPanel implements ActionListener {
 			System.out.println("URL invalida");
 			System.exit(128);
 		} catch (RemoteException e){
+			e.printStackTrace();
 			System.out.println("Excepcion remota tratanod de conectarse al servidor");
 			System.exit(128);
 		}
