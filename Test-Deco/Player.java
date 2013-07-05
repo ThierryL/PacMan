@@ -54,6 +54,7 @@ public class Player extends JPanel implements ActionListener {
 	private static String nextAddress = "";
 	private static int portInUse;
 	private int clientStatus = 0;
+    private boolean deconnection = false;
 
 	boolean win = false;
 	boolean end = false;
@@ -153,20 +154,21 @@ public class Player extends JPanel implements ActionListener {
 	private void reconnect() {
 		game = null;
 		player = null;
-		ShowDecoScreen();
+        deconnection = true;
+        repaint();
 		try {
 			game = (I_InfoGame) Naming.lookup("rmi://"+currentAddress+":1099/I_InfoGame");
 		} catch (Exception e){
-			System.out.println("Exception Game");
 			reconnect();
 		}
 		try {
-			//game.recoverPlayer(playerName);
+            if (!game.getRecoveringServer()) game.recoverPlayer(playerName);
+            else reconnect();
 			player = (I_InfoPlayer) Naming.lookup("rmi://"+currentAddress+":1099/"+playerName);
 		} catch (Exception e){
-			System.out.println("Exception Player");
 			reconnect();
 		}
+        deconnection = false;
 		repaint();
 	}
 
@@ -594,15 +596,17 @@ public class Player extends JPanel implements ActionListener {
 
 		g2d.setColor(Color.black);
 		g2d.fillRect(0, 0, d.width, d.height);
-		DrawMaze();
-		DrawScore();
-		DoAnim();
+        if (deconnection)
+            ShowDecoScreen();
+        else {
+            DrawMaze();
+            DrawScore();
+            DoAnim();
 		try {
 			if(game.moving()) {
 				game.stopped();
 				changeServer();
 			}
-
 			if(game.isPause() ) {
 				ShowPauseScreen();
 			}else if (game.isEnded() && !game.isWaiting()) {
@@ -625,7 +629,7 @@ public class Player extends JPanel implements ActionListener {
 			System.out.println("Exception Paint");
 			e.printStackTrace();
 		}
-
+        }
 		g.drawImage(ii, 5, 5, this);
 		Toolkit.getDefaultToolkit().sync();
 		g.dispose();

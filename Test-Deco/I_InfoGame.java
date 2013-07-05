@@ -8,6 +8,10 @@ public interface I_InfoGame extends Remote{
     
     public void recoverPlayer(String name) throws RemoteException;
     
+    public void setRecoveringServer(boolean b) throws RemoteException;
+    
+    public boolean getRecoveringServer() throws RemoteException;
+    
     public void disconnect(String name) throws RemoteException;
 
     public void moveGhosts() throws RemoteException;

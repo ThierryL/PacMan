@@ -554,28 +554,57 @@ public class Server{
 	    }
 
     }
+    
+	public static void recuperationServer() {
+		String serverAddress = "rmi://"+serverInfo.getIpAddr()+":1099/I_InfoGame";
+		try{
+            Naming.unbind(serverAddress);
+			game = new InfoGame();
+			server = new Server();
+			game.setServer(server);
+			game.setServerAddress(serverInfo.getIpAddr());
+			game.setNextAddress(serverInfo.getNext().getIpAddr());
+			game.setNbPlayerExpected(numPlayer);
+            game.setRecoveringServer(true);
+			Naming.rebind(serverAddress, game);
+			socketPortClient = serverInfo.getPortClient();
+        } catch (NotBoundException e){
+			System.out.println("El servicio no esta publicado");
+		} catch (RemoteException e){
+			System.out.println("Hubo una excepcion creando la instancia del objeto distribuido");
+		} catch (MalformedURLException e){
+			System.out.println("URL mal formada al tratar de publicar el objeto");
+		}
+	}
+    
     private static void recuperacionFallas(){
 	    File file = new File(serverName+".swp");
 	    if (file.exists()){
+            System.out.println("Got the file");
 		    try {
 			    System.out.println("Un fichero de salvaguarda es presente:");
-			    boolean b=true;
-			    while(b){
-				    System.out.println("Quiere recuperar el antiguo juego(y/n)?");
-				    BufferedReader in=new BufferedReader(new InputStreamReader(System.in));
-				    String s=in.readLine();
+                System.out.println("Quiere recuperar el antiguo juego(y/n)?");
+                BufferedReader in=new BufferedReader(new InputStreamReader(System.in));
+                while(true) {
+                    System.out.println("Yes");
+                    String s = in.readLine();
 				    if(s.equals("y")){
+                        System.out.println("Yes");
+                        recuperationServer();
 					    InputStream ips=new FileInputStream(serverName+".swp"); 
 					    InputStreamReader ipsr=new InputStreamReader(ips);
 					    BufferedReader br=new BufferedReader(ipsr);
 					    String info=br.readLine();
 					    reconstruction(info);
-
-					    b=false;
-				    }else if(s.equals("n")){ 
-					    b=false;
+                        game.setRecoveringServer(false);
+                        break;
+				    }else if(s.equals("n")){
+                        serverInit();
+                        System.out.println("No");
+					    break;
 				    }
-			    }
+                }
+			    
 		    }catch (FileNotFoundException e) {
 			    System.out.println("Failed to wait");
 		    }catch (IOException e) {
@@ -583,6 +612,7 @@ public class Server{
 		    }
 
 	    }
+        else serverInit();
 	    saveStateServer();
     }
 
@@ -608,7 +638,6 @@ public class Server{
 		}
 		else {
 			if (args.length == 2) numPlayer = Integer.parseInt(args[0]);
-			serverInit();
 			recuperacionFallas();
 			serverRunning();
 		}

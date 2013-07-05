@@ -42,6 +42,7 @@ public class InfoGame  extends UnicastRemoteObject implements I_InfoGame{
 	private boolean waiting = true;
 	private boolean ended = false;
 	private boolean pause = false;
+    private boolean recoveringServer = false;
 	private String playerCallPause;
 
 	private String newAddress = "";
@@ -607,6 +608,14 @@ public class InfoGame  extends UnicastRemoteObject implements I_InfoGame{
 	public int getClientPort() throws RemoteException{
 		return server.getClientPort();
 	}
+    
+    public void setRecoveringServer(boolean b) throws RemoteException {
+        recoveringServer = b;
+    }
+    
+    public boolean getRecoveringServer() throws RemoteException {
+        return recoveringServer;
+    }
 
 	public void saveConf(String name) throws RemoteException{
 		for (int i = 0; i<players.size(); i++){
