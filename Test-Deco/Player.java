@@ -53,6 +53,7 @@ public class Player extends JPanel implements ActionListener {
 	private static String currentAddress;
 	private static String nextAddress = "";
 	private static int portInUse;
+    int response = 0;
 
 	boolean win = false;
 	boolean end = false;
@@ -86,19 +87,15 @@ public class Player extends JPanel implements ActionListener {
 			System.exit(128);
 		}
         
-		if (namePlayer.equals("")){
-			playerName = "Player" + (int)(Math.random()*1000);
-            System.out.println(playerName);
-		}else{
-			playerName=namePlayer;
-		}
+		playerName = namePlayer;
 
 		try {
-			game.newPlayer(playerName);
+			response = game.newPlayer(playerName);
         } catch (RemoteException re){
             reconnect();
 		} catch (Exception e) {
-			System.out.println("Exception");
+			System.out.println("Exception Récupération");
+            e.printStackTrace();
 		}
 
 
@@ -114,24 +111,29 @@ public class Player extends JPanel implements ActionListener {
 			System.out.println("Excepcion remota tratanod de conectarse al servidor");
 			System.exit(128); 
 		}
+        
+        GetImages();
+        
+        addKeyListener(new TAdapter());
+        mazecolor = new Color(5, 100, 5);
+        setFocusable(true);
+        
+        d = new Dimension(400, 400);
+        
+        setBackground(Color.black);
+        setDoubleBuffered(true);
+        timer = new Timer(40, this);
+        timer.start();
 
-
-		GetImages();
-
-		addKeyListener(new TAdapter());
-		mazecolor = new Color(5, 100, 5);
-		setFocusable(true);
-
-		d = new Dimension(400, 400);
-
-		setBackground(Color.black);
-		setDoubleBuffered(true);
-		timer = new Timer(40, this);
-		timer.start();
-	}
+        if (response == 1) {
+            System.out.println("Old PLayer");
+            PlayGame();
+        }
+    }
 
 
 	public void addNotify() {
+        if (response == 1) return;
 		super.addNotify();
 		try {
 			player.playerInit();
@@ -142,7 +144,8 @@ public class Player extends JPanel implements ActionListener {
 		} catch (RemoteException re){
             reconnect();
 		} catch (Exception e) {
-			System.out.println("Exception");
+			System.out.println("Exception addNotify");
+            e.printStackTrace();
 		}
 
 	}
@@ -233,7 +236,8 @@ public class Player extends JPanel implements ActionListener {
 		} catch (RemoteException re){
             reconnect();
 		} catch (Exception e) {
-			System.out.println("Exception");
+			System.out.println("Exception Pause Screen");
+            e.printStackTrace();
 		}
 	}
 	public void ShowEndScreen() {
@@ -255,7 +259,8 @@ public class Player extends JPanel implements ActionListener {
 		} catch (RemoteException re){
             reconnect();
 		} catch (Exception e) {
-			System.out.println("Exception");
+			System.out.println("Exception End Screen");
+            e.printStackTrace();
 		}
 	}
 
@@ -278,7 +283,8 @@ public class Player extends JPanel implements ActionListener {
 		} catch (RemoteException re){
             reconnect();
 		} catch (Exception e) {
-			System.out.println("Exception");
+			System.out.println("Exception Dead Screen");
+            e.printStackTrace();
 		}
 	}
 
@@ -301,7 +307,8 @@ public class Player extends JPanel implements ActionListener {
 		} catch (RemoteException re){
             reconnect();
 		} catch (Exception e) {
-			System.out.println("Exception");
+			System.out.println("Exception Intro Screen");
+            e.printStackTrace();
 		}
 	}
 
@@ -326,7 +333,8 @@ public class Player extends JPanel implements ActionListener {
 		} catch (RemoteException re){
             reconnect();
 		} catch (Exception e) {
-			System.out.println("Exception");
+			System.out.println("Exception Waiting Screen");
+            e.printStackTrace();
 		}
 	}
 
@@ -356,7 +364,8 @@ public class Player extends JPanel implements ActionListener {
 		} catch (RemoteException re){
             reconnect();
 		} catch (Exception e) {
-			System.out.println("Exception");
+			System.out.println("Exception Draw Score");
+            e.printStackTrace();
 		}
 	}
 
@@ -375,7 +384,8 @@ public class Player extends JPanel implements ActionListener {
 		} catch (RemoteException re){
             reconnect();
 		} catch (Exception e) {
-			System.out.println("Exception");
+			System.out.println("Exception Draw Ghost");
+            e.printStackTrace();
 		}
 	}
 
@@ -398,7 +408,8 @@ public class Player extends JPanel implements ActionListener {
 		} catch (RemoteException re){
             reconnect();
 		} catch (Exception e) {
-			System.out.println("Exception");
+			System.out.println("Exception Draw PacMan");
+            e.printStackTrace();
 		}
 
 	}
@@ -423,7 +434,8 @@ public class Player extends JPanel implements ActionListener {
 		} catch (RemoteException re){
             reconnect();
 		} catch (Exception e) {
-			System.out.println("Exception");
+			System.out.println("Exception Draw PacMan Up");
+            e.printStackTrace();
 		}
 
 	}
@@ -449,7 +461,8 @@ public class Player extends JPanel implements ActionListener {
 		} catch (RemoteException re){
             reconnect();
 		} catch (Exception e) {
-			System.out.println("Exception");
+			System.out.println("Exception Draw PacMan Down");
+            e.printStackTrace();
 		}
 
 	}
@@ -475,7 +488,8 @@ public class Player extends JPanel implements ActionListener {
 		} catch (RemoteException re){
             reconnect();
 		} catch (Exception e) {
-			System.out.println("Exception");
+			System.out.println("Exception Draw PacMan Left");
+            e.printStackTrace();
 		}
 
 	}
@@ -501,7 +515,8 @@ public class Player extends JPanel implements ActionListener {
 		} catch (RemoteException re){
             reconnect();
 		} catch (Exception e) {
-			System.out.println("Exception");
+			System.out.println("Exception Draw PacMan Right");
+            e.printStackTrace();
 		}
 
 	}
@@ -551,7 +566,8 @@ public class Player extends JPanel implements ActionListener {
         } catch (RemoteException re){
             reconnect();
         } catch (Exception e) {
-            System.out.println("Exception");
+            System.out.println("Exception Draw Maze");
+            e.printStackTrace();
         }
 	}
 
@@ -613,7 +629,8 @@ public class Player extends JPanel implements ActionListener {
 		} catch (RemoteException re){
             reconnect();
 		} catch (Exception e) {
-			System.out.println("Exception");
+			System.out.println("Exception Paint");
+            e.printStackTrace();
 		}
 
 
@@ -703,7 +720,8 @@ public class Player extends JPanel implements ActionListener {
 		} catch (RemoteException re){
             reconnect();
 		} catch (Exception e) {
-			System.out.println("Exception");
+			System.out.println("Exception PlayGame");
+            e.printStackTrace();
 		}
 
 	}
@@ -735,7 +753,8 @@ public class Player extends JPanel implements ActionListener {
             } catch (RemoteException re){
                 reconnect();
             } catch (Exception e) {
-                System.out.println("Exception");
+                System.out.println("Exception Check Maze");
+                e.printStackTrace();
             }
     }
 
@@ -762,7 +781,8 @@ public class Player extends JPanel implements ActionListener {
                 } catch (RemoteException re){
                     reconnect();
                 } catch (Exception e) {
-                    System.out.println("Exception");
+                    System.out.println("Exception Check Player Killed");
+                    e.printStackTrace();
                 }
 
 		}
@@ -821,7 +841,8 @@ public class Player extends JPanel implements ActionListener {
 		} catch (RemoteException re){
             reconnect();
 		} catch (Exception e) {
-			System.out.println("Exception");
+			System.out.println("Exception Move PacMan");
+            e.printStackTrace();
 		}
 	}
 
@@ -847,7 +868,8 @@ public class Player extends JPanel implements ActionListener {
 		} catch (RemoteException re){
             reconnect();
 		}catch (Exception e) {
-			System.out.println("Exception");
+			System.out.println("Exception Death");
+            e.printStackTrace();
 		}
 	}
 
@@ -857,7 +879,8 @@ public class Player extends JPanel implements ActionListener {
 		} catch (RemoteException re){
             reconnect();
 		} catch (Exception e) {
-			System.out.println("Exception");
+			System.out.println("Exception Exit");
+            e.printStackTrace();
 		}
 	}
 
@@ -965,7 +988,8 @@ public class Player extends JPanel implements ActionListener {
 			} catch (RemoteException re){
                 reconnect();
             } catch (Exception ex) {
-			System.out.println("Exception");
+                System.out.println("Exception Key Pressed");
+                ex.printStackTrace();
 		}
 
 		}
@@ -983,7 +1007,8 @@ public class Player extends JPanel implements ActionListener {
 				} catch (RemoteException re){
                     reconnect();
                 } catch (Exception ex) {
-                System.out.println("Exception");
+                    System.out.println("Exception Key Released");
+                    ex.printStackTrace();
             }
 
 			}

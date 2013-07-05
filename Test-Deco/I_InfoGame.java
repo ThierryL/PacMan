@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 public interface I_InfoGame extends Remote{
 
-    public void newPlayer(String name) throws RemoteException;
+    public int newPlayer(String name) throws RemoteException;
     
     public void recoverPlayer(String name) throws RemoteException;
     

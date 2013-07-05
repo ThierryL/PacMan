@@ -15,16 +15,16 @@ public class InfoGame  extends UnicastRemoteObject implements I_InfoGame{
 	/**
 	 * 
 	 */
-	
-    private final int blocksize = 24;
-    private final int nrofblocks = 15;
-    private final int scrsize = nrofblocks * blocksize;
-    private int nrofghosts = 6;
-    private int deathcounter = 0;
-    private int[] ghostx, ghosty;
 
-    private ArrayList<I_InfoPlayer> players = null;
-    private ArrayList<I_InfoPlayer> saveStatePlayers = null;
+	private final int blocksize = 24;
+	private final int nrofblocks = 15;
+	private final int scrsize = nrofblocks * blocksize;
+	private int nrofghosts = 6;
+	private int deathcounter = 0;
+	private int[] ghostx, ghosty;
+
+	private ArrayList<I_InfoPlayer> players = null;
+	private ArrayList<I_InfoPlayer> saveStatePlayers = null;
 
 	private short[] screendata;
 
@@ -37,7 +37,7 @@ public class InfoGame  extends UnicastRemoteObject implements I_InfoGame{
 	private int nbPlayerPlaying = 0;
 
 	private static final long serialVersionUID = 1L;
-	
+
 	private boolean playing = false;
 	private boolean waiting = true;
 	private boolean ended = false;
@@ -57,18 +57,18 @@ public class InfoGame  extends UnicastRemoteObject implements I_InfoGame{
 	protected InfoGame() throws RemoteException {
 		super();
 	}
-    
-    public void disconnect(String name) throws RemoteException {
-        int i;
-        for (i=0; i<players.size(); i++) {
-            String val = players.get(i).getName();
-            if (val.equals(name)) {
-                break;
-            }
-        }
-        server.disconnect(name, players.get(i));
-    }
-	
+
+	public void disconnect(String name) throws RemoteException {
+		int i;
+		for (i=0; i<players.size(); i++) {
+			String val = players.get(i).getName();
+			if (val.equals(name)) {
+				break;
+			}
+		}
+		server.disconnect(name, players.get(i));
+	}
+
 	public void construction(String info) throws RemoteException{
 		String[] infoComplete = info.split("%%%");
 		reconstruction(infoComplete[0]);
@@ -95,36 +95,36 @@ public class InfoGame  extends UnicastRemoteObject implements I_InfoGame{
 			cont++;
 		}
 		screendata = new short[nrofblocks * nrofblocks];
-			for (int i = 0; i < screendata.length; i++) {
-				screendata[i] = Short.parseShort(infos[cont]);
-				cont++;
-			}
-		nbPlayer = Integer.valueOf(infos[cont]);
+		for (int i = 0; i < screendata.length; i++) {
+			screendata[i] = Short.parseShort(infos[cont]);
 			cont++;
+		}
+		nbPlayer = Integer.valueOf(infos[cont]);
+		cont++;
 
 		nbPlayerExpected = Integer.valueOf(infos[cont]);
-			cont++;
+		cont++;
 		nbPlayerWaiting = Integer.valueOf(infos[cont]);
-			cont++;
+		cont++;
 		nbPlayerPlaying = Integer.valueOf(infos[cont]);
-			cont++;
+		cont++;
 
 
 		playing = Boolean.valueOf(infos[cont]);
-			cont++;
+		cont++;
 		waiting = Boolean.valueOf(infos[cont]);
-			cont++;
+		cont++;
 		ended = Boolean.valueOf(infos[cont]);
-			cont++;
+		cont++;
 		pause = Boolean.valueOf(infos[cont]);
-			cont++;
+		cont++;
 		playerCallPause = infos[cont];
-			cont++;
+		cont++;
 
 	}
 
 	private void createPlayers(String infoPlayer) {
-		
+
 		String[] infos = infoPlayer.split(" ");
 
 		String namePlayer = infos[14];
@@ -238,98 +238,98 @@ public class InfoGame  extends UnicastRemoteObject implements I_InfoGame{
 	public String getNextAddress() throws RemoteException{
 		return newAddress;
 	}
-    
-    public void recoverPlayer(String name) throws RemoteException {
-        if (findPlayer(name) != null) {
-            try {
-                Naming.unbind("rmi://localhost:1099/"+name);
-                I_InfoPlayer player = null;
-                for (int i = 0; i<players.size(); i++){
-                    if(saveStatePlayers.get(i).getName().equals(name)) {
-                        players.set(i, saveStatePlayers.get(i));
-                        player = players.get(i);
-                        break;
-                    }
-                }
-                Naming.rebind("rmi://"+serverAddress+":1099/"+name, player);
-            }  catch (Exception e) {
-                System.out.println("Failed To unbind/rebind object with the RMI registry");
-            }
-        }
-        else {
-            System.out.println("Failed Recovery");
-            newPlayer(name);
-        }
-    }
 
-    public void newPlayer(String name) throws RemoteException{
+	public void recoverPlayer(String name) throws RemoteException {
+		if (findPlayer(name) != null) {
+			try {
+				Naming.unbind("rmi://localhost:1099/"+name);
+				I_InfoPlayer player = null;
+				for (int i = 0; i<players.size(); i++){
+					if(saveStatePlayers.get(i).getName().equals(name)) {
+						players.set(i, saveStatePlayers.get(i));
+						player = players.get(i);
+						break;
+					}
+				}
+				Naming.rebind("rmi://"+serverAddress+":1099/"+name, player);
+			}  catch (Exception e) {
+				System.out.println("Failed To unbind/rebind object with the RMI registry");
+			}
+		}
+		else {
+			System.out.println("Failed Recovery");
+			newPlayer(name);
+		}
+	}
 
-	try {
+	public int newPlayer(String name) throws RemoteException{
 
 		I_InfoPlayer player = findPlayer(name);
-        if(player == null) {
-            System.out.println("NewPlayer");
-            player = new InfoPlayer(name);
-			Naming.rebind("rmi://"+serverAddress+":1099/"+name, player);
+		if(player == null) {
+			System.out.println("NewPlayer");
+			player = new InfoPlayer(name);
+			try {
+				Naming.rebind("rmi://"+serverAddress+":1099/"+name, player);
+			} catch (RemoteException e){
+				System.out.println("Hubo una excepcion creando la instancia del objeto distribuido");
+			} catch (MalformedURLException e){
+				System.out.println("URL mal formada al tratar de publicar el objeto");
+			}
 			players.add(player);
 			saveStatePlayers.add(player);
 			nbPlayer += 1;
+			return 0;
 		}
-        else {
-            System.out.println("Old One");
-            recoverPlayer(name);
-        }
-	} catch (RemoteException e){
-		System.out.println("Hubo una excepcion creando la instancia del objeto distribuido");
-	} catch (MalformedURLException e){
-		System.out.println("URL mal formada al tratar de publicar el objeto");
+		else {
+			System.out.println("Old One");
+			recoverPlayer(name);
+			return 1;
+		}
 	}
 
-    }
+	public I_InfoPlayer findPlayer(String name){
+		I_InfoPlayer p=null;
+		try {
+			for (int i = 0; i<players.size(); i++){
+				if(players.get(i).getName().equals(name)) {
+					p=players.get(i);
+					break;
+				}
+			}
+		} catch (Exception exc) {
+			exc.printStackTrace();
+		}
+		return p;
 
-    public I_InfoPlayer findPlayer(String name){
-	    I_InfoPlayer p=null;
-	    try {
-		    for (int i = 0; i<players.size(); i++){
-			    if(players.get(i).getName().equals(name)) {
-				    p=players.get(i);
-				    break;
-			    }
-		    }
-	    } catch (Exception exc) {
-		    exc.printStackTrace();
-	    }
-	    return p;
+	}
 
-    }
+	public void moveGhosts() throws RemoteException {
+		server.moveGhosts();
+	}
 
-    public void moveGhosts() throws RemoteException {
-	    server.moveGhosts();
-    }
-
-    public void levelContinue() throws RemoteException {
-	    server.LevelContinue();
-    }
+	public void levelContinue() throws RemoteException {
+		server.LevelContinue();
+	}
 
 	public  ArrayList<I_InfoPlayer> getPlayers() throws RemoteException {
 		return this.players;
 	}
 
-//	public void setCurrentSpeed(int currentSpeed) throws RemoteException {
-//		this.currentSpeed = currentSpeed;
-//	}
-//
-//	public int getCurrentSpeed() throws RemoteException {
-//		return this.currentSpeed;
-//	}
-//
-//	public int getMaxSpeed() throws RemoteException {
-//		return this.maxSpeed;
-//	}
-//
-//	public int[] getValidSpeeds() throws RemoteException {
-//		return this.validSpeeds;
-//	}
+	//	public void setCurrentSpeed(int currentSpeed) throws RemoteException {
+	//		this.currentSpeed = currentSpeed;
+	//	}
+	//
+	//	public int getCurrentSpeed() throws RemoteException {
+	//		return this.currentSpeed;
+	//	}
+	//
+	//	public int getMaxSpeed() throws RemoteException {
+	//		return this.maxSpeed;
+	//	}
+	//
+	//	public int[] getValidSpeeds() throws RemoteException {
+	//		return this.validSpeeds;
+	//	}
 
 
 	public void setNbPlayerExpected(int n){
@@ -353,13 +353,13 @@ public class InfoGame  extends UnicastRemoteObject implements I_InfoGame{
 	}
 
 
-    public void setServer(Server s) {
-    	server = s;
-	players = new ArrayList<I_InfoPlayer>();
-	saveStatePlayers = new ArrayList<I_InfoPlayer>();
-    }
+	public void setServer(Server s) {
+		server = s;
+		players = new ArrayList<I_InfoPlayer>();
+		saveStatePlayers = new ArrayList<I_InfoPlayer>();
+	}
 
-    public boolean isEnded()  throws RemoteException{
+	public boolean isEnded()  throws RemoteException{
 		return ended;
 	}
 
@@ -367,8 +367,8 @@ public class InfoGame  extends UnicastRemoteObject implements I_InfoGame{
 		this.ended = ended;
 	}
 
-    
-    public boolean isPlaying()  throws RemoteException{
+
+	public boolean isPlaying()  throws RemoteException{
 		return playing;
 	}
 
@@ -376,7 +376,7 @@ public class InfoGame  extends UnicastRemoteObject implements I_InfoGame{
 		this.playing = playing;
 	}
 
-    public boolean isPause()  throws RemoteException{
+	public boolean isPause()  throws RemoteException{
 		return pause;
 	}
 
@@ -387,31 +387,31 @@ public class InfoGame  extends UnicastRemoteObject implements I_InfoGame{
 		}else if (player.equals(playerCallPause)){
 			this.pause=pause;
 		}
-			
+
 	}
 
 	public String getPlayerCallPause() throws RemoteException{
 		return playerCallPause;
 	}
-	
-    public boolean isWaiting()  throws RemoteException{
+
+	public boolean isWaiting()  throws RemoteException{
 		return waiting;
 	}
 	public void setWaiting(boolean waiting)  throws RemoteException{
 		this.waiting = waiting;
 	}
-    
-    public void InitScreenData(){
-        screendata = new short[nrofblocks * nrofblocks];
-    }    
-    
-    public void Initghostx(int[] m){
-        setGhostx(m);
-    }   
-    
-    public void Initghosty(int[] m){
-        setGhosty(m);
-    }
+
+	public void InitScreenData(){
+		screendata = new short[nrofblocks * nrofblocks];
+	}    
+
+	public void Initghostx(int[] m){
+		setGhostx(m);
+	}   
+
+	public void Initghosty(int[] m){
+		setGhosty(m);
+	}
 
 	public int getNrofghosts() {
 		return nrofghosts;
@@ -521,22 +521,22 @@ public class InfoGame  extends UnicastRemoteObject implements I_InfoGame{
 	public void finished() {
 		server.finished();
 		try{
-	//	I_InfoPlayer tmp = players.get(0);
-	//	for (int i = 0; i<players.size(); i++)
-	//		if (tmp.getScore() < players.get(i).getScore()) {
-	//			tmp = players.get(i);
-	//		}
-	//	for (int i = 0; i<players.size(); i++) {
-	//		if (!tmp.getName().equals(players.get(i).getName())){
-	//			players.get(i).isLooser();
-	//	}
-	//		else players.get(i).isWinner();
-	//	}
-		//playerWaiting = 0;
-		//playerInGame = 0;
+			//	I_InfoPlayer tmp = players.get(0);
+			//	for (int i = 0; i<players.size(); i++)
+			//		if (tmp.getScore() < players.get(i).getScore()) {
+			//			tmp = players.get(i);
+			//		}
+			//	for (int i = 0; i<players.size(); i++) {
+			//		if (!tmp.getName().equals(players.get(i).getName())){
+			//			players.get(i).isLooser();
+			//	}
+			//		else players.get(i).isWinner();
+			//	}
+			//playerWaiting = 0;
+			//playerInGame = 0;
 		} catch (Exception exc) {
-				exc.printStackTrace();
-        	}
+			exc.printStackTrace();
+		}
 	}
 
 	public void exit(String name) {
@@ -585,19 +585,19 @@ public class InfoGame  extends UnicastRemoteObject implements I_InfoGame{
 
 	public boolean allDead() throws RemoteException{
 
-      		for(int k = 0; k<players.size(); k++){
+		for(int k = 0; k<players.size(); k++){
 			if(players.get(k).isPlaying()){
 				return false;
 			}
-      		}
+		}
 		return true;
 	}
 
 	public void restart() throws RemoteException{
 
-      		for(int k = 0; k<players.size(); k++){
+		for(int k = 0; k<players.size(); k++){
 			players.get(k).playerInit();
-      		}
+		}
 		server.LevelInit();
 		waiting = true;
 		playing = false;
@@ -607,14 +607,14 @@ public class InfoGame  extends UnicastRemoteObject implements I_InfoGame{
 	public int getClientPort() throws RemoteException{
 		return server.getClientPort();
 	}
-    
+
 	public void saveConf(String name) throws RemoteException{
-		    for (int i = 0; i<players.size(); i++){
-			    if(players.get(i).getName().equals(name)) {
-				    saveStatePlayers.set(i, players.get(i));
-				    break;
-			    }
-		    }
+		for (int i = 0; i<players.size(); i++){
+			if(players.get(i).getName().equals(name)) {
+				saveStatePlayers.set(i, players.get(i));
+				break;
+			}
+		}
 	}
 
 }

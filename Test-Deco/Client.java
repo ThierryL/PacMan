@@ -10,22 +10,20 @@ public class Client extends JFrame
 	private static I_InfoGame game = null;
 	private Player player;
 	private static String currentAddress;
-	
+
 	public Client(String namePlayer){
-			player = new Player(currentAddress, namePlayer);
-			add(player);
-			setTitle("Pacman");
-			setDefaultCloseOperation(EXIT_ON_CLOSE);
-			setSize(380, 420);
-			setLocationRelativeTo(null);
-			setVisible(true);
+		player = new Player(currentAddress, namePlayer);
+		add(player);
+		setTitle("Pacman");
+		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		setSize(380, 420);
+		setLocationRelativeTo(null);
+		setVisible(true);
 	}
-	
+
 	static public void main(String[] args){
 		String namePlayer = "";
-		if (args.length == 1) {
-			currentAddress = args[0];
-		}else if (args.length == 2) {
+		if (args.length == 2) {
 			currentAddress = args[0];
 			namePlayer=args[1];
 		}else{
